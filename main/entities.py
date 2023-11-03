@@ -7,6 +7,7 @@
 # @File : entities.py
 # @Software: PyCharm
 import dataclasses
+import enum
 from dataclasses import dataclass
 from typing import List
 
@@ -42,3 +43,4 @@ class RepoFeature:
             "file_path": self.repo_path,
             "feature_dict": [ff.custom_serialize() for ff in self.file_features],
         }
+
