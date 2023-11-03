@@ -1,0 +1,43 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+# log
+loguru = "*"
+# bloom filter
+bitarray = "==1.1.0"
+pybloom3 = "*"
+# extraction
+clang = "==14.0"
+# database
+sqlalchemy = "2.0.0b2"
+psycopg2-binary = "*"
+environs = "*"
+# class 2 json
+dataclasses-json = "*"
+# scrawler
+urllib3 = "==1.26.6"
+requests = "*"
+beautifulsoup4 = "*"
+rapidfuzz = "*"
+tqdm = "*"
+scikit-learn = "*"
+lxml = "*"
+python-levenshtein = "*"
+install = "*"
+tree-sitter = "*"
+gitpython = "*"
+matplotlib = "*"
+seaborn = "*"
+aiohttp = "*"
+aiofiles = "*"
+redis = "*"
+
+[dev-packages]
+fuzzywuzzy = "*"
+
+[requires]
+python_version = "3.9"
+python_full_version = "3.9.6"
