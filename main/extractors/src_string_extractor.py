@@ -12,26 +12,21 @@ from main.extractors.extractor import FeatureExtractor, NodeType
 
 class SrcStringExtractor(FeatureExtractor):
 
-    def extract_file_feature(self, file_path) -> FileFeature:
-        # 初始化根节点
-        node = self.init_root_node(file_path)
+    def extract_file_feature(self, file_path, node) -> FileFeature:
 
         # 提取字符串
-        strings = self.extract_strings(node)
+        strings = self.traverse_node(node)
 
         # 组成特征
         file_feature = FileFeature(
             file_path=file_path,
-            feature_dict={
-                "strings": strings
-            }
+            features=strings
 
         )
         return file_feature
 
-    def extract_strings(self, node):
-        strings = []
-        flag = False # 上一个是不是字符串，主要用来合并多行字符串
+    def traverse_node(self, node):
+        function_names = []
         stack = []  # 使用栈来模拟递归调用
         stack.append(node)
 
@@ -40,29 +35,31 @@ class SrcStringExtractor(FeatureExtractor):
 
             # 处理当前节点
             # 如果是字符串内容节点（双引号中间的部分）
-            if current_node.type == NodeType.string_content.value:
-                # 解析文本
-                node_content_lines = self.parse_node_content(current_node)
-                # 获取字符串内容
-                string_content = node_content_lines[0]
-                # 如果上一个节点是字符串就合并
-                if flag:
-                    strings[-1] = strings[-1] + string_content
-                # 如果不是就直接添加
-                else:
-                    strings.append(string_content)
-                # 标记上一个节点是字符串
-                flag = True
-            # 如果不是字符串节点
-            else:
-                # 判断 是否是 " 或者 字符串节点（带双引号的字符串内容），如果不是，改变标记为False
-                if not (current_node.type == '"' or current_node.type == NodeType.string_literal.value):
-                    flag = False
+            if current_node.type in {NodeType.function_declarator, NodeType.function_definition}:
+                body_node = node.child_by_field_name('body')
+                if not body_node:
+                    return
 
-                # 继续判断，如果是开头的 include 声明，直接跳过
-                if current_node.type == NodeType.preproc_include.value:
-                    continue
+                # 解析函数类型，名称
+                identifier_node = node.child_by_field_name('declarator')
+                node_type = identifier_node.type
+                node_name = self.parse_node_content(identifier_node)[0]
+                if node_type == "function_declarator" and node_name.startswith("if ("):
+                    return
+                elif '\t' in node_name:
+                    return
+
+                node_name = process_node_name(node_name)
+                function_names.append(node_name)
 
             # 将子节点压入栈中
             stack.extend(reversed(current_node.children))
-        return strings
+        return function_names
+
+
+def process_node_name(node_name):
+    if "(" in node_name:
+        node_name = node_name.split('(')[0]
+
+    node_name = node_name.replace("* ", "")
+    return node_name

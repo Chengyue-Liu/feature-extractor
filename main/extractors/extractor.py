@@ -65,12 +65,14 @@ class FeatureExtractor:
     def __init__(self, tasks: List[Task], result_dir):
         self.tasks = tasks
         self.result_dir = result_dir
+        os.makedirs(result_dir, exist_ok=True)
 
     @abstractmethod
-    def extract_file_feature(self, file_path) -> FileFeature:
+    def extract_file_feature(self, file_path, node: Node) -> FileFeature:
         """
         输入文件地址，返回文件特征
 
+        :param node:
         :param file_path:
         :return:
         """
@@ -90,7 +92,11 @@ class FeatureExtractor:
                              if f.endswith(tuple(TARGET_FILE_EXTENSION_SET))]
 
         # 提取文件特征
-        file_features = [self.extract_file_feature(path) for path in target_file_paths]
+        file_features = []
+        for path in target_file_paths:
+            node = self.init_root_node(path)
+            file_feature = self.extract_file_feature(path, node)
+            file_features.append(file_feature)
 
         # 生成仓库特征
         repo_feature = RepoFeature(

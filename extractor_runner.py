@@ -11,6 +11,7 @@ from typing import List
 from main.decrators import timing_decorator, log_decorator
 from main.entities import Task
 from main.extractors.extractor import FeatureExtractor
+from main.extractors.src_function_name_extractor import SrcFunctionNameExtractor
 from main.extractors.src_string_extractor import SrcStringExtractor
 
 
@@ -37,16 +38,24 @@ def generate_tasks(repo_dir: str) -> List[Task]:
 @log_decorator
 @timing_decorator
 def run_src_string_extractor(tasks: List[Task], result_dir):
-    src_string_extractor: FeatureExtractor = SrcStringExtractor(tasks, result_dir)
-    src_string_extractor.multiple_run()
+    extractor = SrcStringExtractor(tasks, result_dir)
+    extractor.multiple_run()
+
+
+@log_decorator
+@timing_decorator
+def run_src_function_name_extractor(tasks: List[Task], result_dir):
+    extractor = SrcFunctionNameExtractor(tasks, result_dir)
+    extractor.multiple_run()
 
 
 def main():
     repo_dir = "test_cases/source_code"
-    result_dir = "results"
+    result_dir = "results/strings"
 
     tasks = generate_tasks(repo_dir)
     run_src_string_extractor(tasks, result_dir)
+    # run_src_function_name_extractor(tasks, result_dir)
 
 
 if __name__ == '__main__':

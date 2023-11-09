@@ -21,14 +21,14 @@ class Task:
 
 @dataclasses.dataclass
 class FileFeature:
-    def __init__(self, file_path: str, feature_dict: dict):
+    def __init__(self, file_path: str, features: list):
         self.file_path: str = file_path
-        self.feature_dict: dict = feature_dict
+        self.features: list = features
 
     def custom_serialize(self):
         return {
             "file_path": self.file_path,
-            "feature_dict": self.feature_dict,
+            "features": self.features,
         }
 
 
@@ -43,4 +43,3 @@ class RepoFeature:
             "file_path": self.repo_path,
             "feature_dict": [ff.custom_serialize() for ff in self.file_features],
         }
-
