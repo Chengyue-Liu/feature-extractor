@@ -15,6 +15,12 @@ from main.extractors.src_string_extractor import SrcStringExtractor
 
 
 def generate_tasks(repo_dir: str) -> List[Task]:
+    """
+
+    task: [repo_id, repo_path]
+    :param repo_dir:
+    :return:
+    """
     # todo 这是一个临时的方法
     tasks = []
     repo_id = 0

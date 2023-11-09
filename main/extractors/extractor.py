@@ -7,6 +7,7 @@
 # @Software: PyCharm
 import multiprocessing
 import os
+from abc import abstractmethod
 from typing import List
 
 from tqdm import tqdm
@@ -25,6 +26,8 @@ from main.entities import FileFeature
 from tree_sitter import Language, Parser, Node
 
 from main.settings import LANGUAGE_SO_FILE_PATH
+
+
 class NodeType(enum.Enum):
     # 识别错误
     error = "ERROR"
@@ -49,19 +52,35 @@ class NodeType(enum.Enum):
     m_else = "#else"
     m_endif = "#endif"
 
+
 class FeatureExtractor:
+    """
+    1. 基类
+    2. 实现了多进程并发处理多个repo的函数，以及遍历某个repo的所有文件的函数。
+    3. 实现了初始化 tree sitter 根节点的方法： node = self.init_root_node(file_path)
+    4. 实现了获取某个节点内容的方法： node_content_lines = self.parse_node_content(current_node)
+
+    """
+
     def __init__(self, tasks: List[Task], result_dir):
         self.tasks = tasks
         self.result_dir = result_dir
 
+    @abstractmethod
     def extract_file_feature(self, file_path) -> FileFeature:
-        file_feature = FileFeature(
-            file_path=file_path,
-            feature_dict={}
-        )
-        return file_feature
+        """
+        输入文件地址，返回文件特征
+
+        :param file_path:
+        :return:
+        """
 
     def extract_repo_feature(self, task: Task):
+        """
+        提取一个仓库特征的通用方法
+        :param task:
+        :return:
+        """
         repo_id = task.repo_id
         repo_path = task.repo_path
 
@@ -84,6 +103,10 @@ class FeatureExtractor:
         file_manager.dump_json(repo_feature.custom_serialize(), result_path)
 
     def multiple_run(self):
+        """
+        多进程提取多个仓库的特征的通用方法
+        :return:
+        """
         pool = multiprocessing.Pool(processes=EXTRACTION_PROCESS_NUM)
 
         results = pool.imap_unordered(self.extract_repo_feature, self.tasks)
