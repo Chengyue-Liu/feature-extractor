@@ -1,5 +1,90 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os.path
+import shutil
+import subprocess
+import traceback
+from typing import List
+
+from loguru import logger
+
+from settings import DEBIAN_TAR_FILE_DIR_PATH, DECOMPRESSED_DEBIAN_FILE_DIR_PATH
+from utils.json_util import load_from_json
+
 
 # @Time : 2023/11/21 16:45
 # @Author : Liu Chengyue
+
+def parse_file_name(file_path: str):
+    file_name = os.path.split(file_path)[-1]
+    if "orig" in file_name:
+        return file_name.split(".orig")[0]
+    elif ".deb" in file_name:
+        return file_name[:-4]
+    elif ".udeb" in file_name:
+        return file_name[:-5]
+    else:
+        return file_name
+
+
+def get_decompress_target_path(path):
+    # 获取名称
+    file_name = parse_file_name(path)
+    if "-" in file_name:
+        name_version, release_arch = file_name.split("-")
+        name, version = name_version.split("_")
+        release, arch = release_arch.split("_")
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, name, version, "binary", release, arch)
+
+    else:
+        name, version = file_name.split("_")
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, name, version, "source")
+
+
+def unar_decompress(archive_path, target_dir):
+    # 如果目标文件夹已经存在，跳过
+    if os.path.exists(target_dir):
+        return
+
+    logger.info(f"unar: {archive_path} ---> {target_dir}")
+    if archive_path.endswith('deb'):
+
+        # 创建临时文件夹
+        tmp_dir = f"{target_dir}_tmp"
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+        os.makedirs(tmp_dir)
+
+        # 解压 deb 到 临时文件夹
+        command = f"unar {archive_path} -o {tmp_dir}"
+        subprocess.run(command, shell=True, check=True)
+
+        # 解压 data.tar.gz 到 目标文件夹
+        break_flag = False
+        for root, dirs, files in os.walk(tmp_dir):
+            for f in files:
+                if f.startswith("data."):
+                    f_path = os.path.join(root, f)
+                    command = f"unar {f_path} -o {target_dir}"
+                    subprocess.run(command, shell=True, check=True)
+                    break_flag = True
+                    break
+            if break_flag:
+                break
+
+        # 删除临时文件夹
+        shutil.rmtree(tmp_dir)
+    else:
+        command = f"unar {archive_path} -o {target_dir}"
+        subprocess.run(command, shell=True, check=True)
+
+
+def decompress(src_tar_paths: List[str], bin_tar_paths: List[str]):
+    src_tar_paths.extend(bin_tar_paths)
+    for path in src_tar_paths:
+        try:
+            decompress_target_dir_path = get_decompress_target_path(path)
+            unar_decompress(path, decompress_target_dir_path)
+        except Exception as e:
+            logger.error(f"error occurred when decompress {path}, error: {e}")
+            logger.error(traceback.format_exc())

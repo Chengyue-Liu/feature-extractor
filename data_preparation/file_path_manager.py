@@ -4,7 +4,7 @@ import os
 
 from loguru import logger
 
-from settings import DEBIAN_FILE_DIR_PATH
+from settings import DEBIAN_TAR_FILE_DIR_PATH
 from tqdm import tqdm
 
 
@@ -25,11 +25,12 @@ def is_bin_package(file_name):
 
     return False
 
+
 def get_tar_file_paths():
     src_tar_paths = []
     bin_tar_paths = []
     with tqdm(total=1390665, desc="get_tar_file_paths") as pbar:
-        for root, dirs, files in os.walk(DEBIAN_FILE_DIR_PATH):
+        for root, dirs, files in os.walk(DEBIAN_TAR_FILE_DIR_PATH):
             for f_name in files:
                 pbar.update(1)
 
