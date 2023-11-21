@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import multiprocessing
 
 # @Time : 2023/11/21 16:48
 # @Author : Liu Chengyue
@@ -11,3 +12,5 @@ env.read_env()
 
 DEBIAN_TAR_FILE_DIR_PATH = env.str("DEBIAN_TAR_FILE_DIR_PATH")
 DECOMPRESSED_DEBIAN_FILE_DIR_PATH = env.str("DECOMPRESSED_DEBIAN_FILE_DIR_PATH")
+
+PROCESS_NUM = multiprocessing.cpu_count()
