@@ -11,7 +11,9 @@ from tqdm import tqdm
 # @Time : 2023/11/21 16:48
 # @Author : Liu Chengyue
 def is_src_package(file_name):
-    if file_name.endswith("orig.tar.gz"):
+    if "orig.tar" in file_name \
+            or file_name.endswith('.tar.gz') \
+            or (file_name.endswith('.tar.xz') and not file_name.endswith('.debian.tar.xz')):
         return True
 
     return False
