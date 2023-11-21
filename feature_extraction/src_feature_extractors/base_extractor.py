@@ -98,12 +98,12 @@ class SrcFeatureExtractor:
 
         # 生成仓库特征
         repo_feature = RepoFeature(
-            repo_path=task.repo_path,
+            task=task,
             file_features=file_features
         )
 
         # 保存特征
-        result_path = os.path.join(self.result_dir, f"{task.repo_id}.json")
+        result_path = os.path.join(self.result_dir, f"{task.repo_id}-{task.version_id}.json")
         dump_to_json(repo_feature.custom_serialize(), result_path)
 
     def multiple_run(self):

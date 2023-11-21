@@ -38,7 +38,7 @@ def run_bin_extractor(tasks: List[Task]):
 
 def main():
     # 生成任务
-    # Task.generate_tasks_json()
+    Task.generate_tasks_json()
 
     # 初始化任务
     src_tasks = Task.init_tasks_from_json(SRC_TASKS_JSON)

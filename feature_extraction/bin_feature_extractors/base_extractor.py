@@ -23,7 +23,6 @@ class BinFeatureExtractor:
         self.result_dir = os.path.join(FEATURE_RESULT_DIR, self.__class__.__name__)
         os.makedirs(self.result_dir, exist_ok=True)
 
-
     @abstractmethod
     def extract_file_feature(self, path: str) -> FileFeature:
         pass
@@ -54,12 +53,12 @@ class BinFeatureExtractor:
 
         # 生成仓库特征
         repo_feature = RepoFeature(
-            repo_path=task.repo_path,
+            task=task,
             file_features=file_features
         )
 
         # 保存特征
-        result_path = os.path.join(self.result_dir, f"{task.repo_id}.json")
+        result_path = os.path.join(self.result_dir, f"{task.repo_id}-{task.version_id}-{task.release_id}-{task.arch_id}.json")
         dump_to_json(repo_feature.custom_serialize(), result_path)
 
     def multiple_run(self):
