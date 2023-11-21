@@ -27,7 +27,6 @@ def is_bin_package(file_name):
 
 
 def parse_src_info(file_name):
-
     package_name, version = file_name
     pass
 
