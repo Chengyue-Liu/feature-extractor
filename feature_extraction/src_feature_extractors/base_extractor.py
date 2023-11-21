@@ -12,20 +12,20 @@ from typing import List
 
 from tqdm import tqdm
 
-from main.constants import TARGET_FILE_EXTENSION_SET
-from main.entities import FileFeature, RepoFeature, Task
-from main.settings import EXTRACTION_PROCESS_NUM
-from main.utils import file_manager
+from feature_extraction.constants import TARGET_FILE_EXTENSION_SET
+from feature_extraction.entities import FileFeature, RepoFeature, Task
+from settings import PROCESS_NUM, FEATURE_RESULT_DIR
 import enum
 
 from loguru import logger
 
-from main.constants import C_EXTENSION_SET, CPP_EXTENSION_SET
-from main.entities import FileFeature
+from feature_extraction.constants import C_EXTENSION_SET, CPP_EXTENSION_SET
+from feature_extraction.entities import FileFeature
 
 from tree_sitter import Language, Parser, Node
 
-from main.settings import LANGUAGE_SO_FILE_PATH
+from settings import LANGUAGE_SO_FILE_PATH
+from utils.json_util import dump_to_json
 
 
 class NodeType(enum.Enum):
@@ -53,7 +53,7 @@ class NodeType(enum.Enum):
     m_endif = "#endif"
 
 
-class FeatureExtractor:
+class SrcFeatureExtractor:
     """
     1. 基类
     2. 实现了多进程并发处理多个repo的函数，以及遍历某个repo的所有文件的函数。
@@ -62,17 +62,17 @@ class FeatureExtractor:
 
     """
 
-    def __init__(self, tasks: List[Task], result_dir):
+    def __init__(self, tasks: List[Task]):
         self.tasks = tasks
-        self.result_dir = result_dir
-        os.makedirs(result_dir, exist_ok=True)
+        self.result_dir = os.path.join(FEATURE_RESULT_DIR, self.__class__.__name__)
+        os.makedirs(self.result_dir, exist_ok=True)
 
     @abstractmethod
-    def extract_file_feature(self, file_path, node: Node) -> FileFeature:
+    def extract_file_feature(self, file_path, root_node: Node) -> FileFeature:
         """
         输入文件地址，返回文件特征
 
-        :param node:
+        :param root_node:
         :param file_path:
         :return:
         """
@@ -83,11 +83,9 @@ class FeatureExtractor:
         :param task:
         :return:
         """
-        repo_id = task.repo_id
-        repo_path = task.repo_path
 
         # 筛选目标文件
-        target_file_paths = [os.path.join(root, f) for root, dirs, files in os.walk(repo_path)
+        target_file_paths = [os.path.join(root, f) for root, dirs, files in os.walk(task.repo_path)
                              for f in files
                              if f.endswith(tuple(TARGET_FILE_EXTENSION_SET))]
 
@@ -100,25 +98,27 @@ class FeatureExtractor:
 
         # 生成仓库特征
         repo_feature = RepoFeature(
-            repo_path=repo_path,
+            repo_path=task.repo_path,
             file_features=file_features
         )
 
         # 保存特征
-        result_path = os.path.join(self.result_dir, f"{repo_id}.json")
-        file_manager.dump_json(repo_feature.custom_serialize(), result_path)
+        result_path = os.path.join(self.result_dir, f"{task.repo_id}.json")
+        dump_to_json(repo_feature.custom_serialize(), result_path)
 
     def multiple_run(self):
         """
         多进程提取多个仓库的特征的通用方法
         :return:
         """
-        pool = multiprocessing.Pool(processes=EXTRACTION_PROCESS_NUM)
+        pool = multiprocessing.Pool(processes=PROCESS_NUM)
 
         results = pool.imap_unordered(self.extract_repo_feature, self.tasks)
 
         for _ in tqdm(results, total=len(self.tasks), desc="multiple run extract repo features"):
             pass
+        pool.close()
+        pool.join()
 
     def init_root_node(self, file_path):
         parser = Parser()

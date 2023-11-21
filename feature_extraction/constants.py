@@ -13,6 +13,7 @@ C_EXTENSION_SET = {
     ".h",
     ".H",
 }
+
 CPP_EXTENSION_SET = {
     # c++
     ".cc",

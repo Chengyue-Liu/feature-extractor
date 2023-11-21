@@ -10,7 +10,18 @@ from environs import Env
 env = Env()
 env.read_env()
 
+# share
+PROCESS_NUM = env.int("EXTRACTION_PROCESS_NUM", multiprocessing.cpu_count())
+
+# data preparation
 DEBIAN_TAR_FILE_DIR_PATH = env.str("DEBIAN_TAR_FILE_DIR_PATH")
 DECOMPRESSED_DEBIAN_FILE_DIR_PATH = env.str("DECOMPRESSED_DEBIAN_FILE_DIR_PATH")
 
-PROCESS_NUM = multiprocessing.cpu_count()
+# feature extraction
+LANGUAGE_SO_FILE_PATH = env.str("LANGUAGE_SO_FILE_PATH", "resources/build/my-languages-mac.so")
+
+SRC_TASKS_JSON = env.str("SRC_TASKS_JSON", "resources/tasks/src_tasks.json")
+BIN_TASKS_JSON = env.str("BIN_TASKS_JSON", "resources/tasks/bin_tasks.json")
+
+FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
+

@@ -11,7 +11,6 @@ from loguru import logger
 from tqdm import tqdm
 
 from settings import DEBIAN_TAR_FILE_DIR_PATH, DECOMPRESSED_DEBIAN_FILE_DIR_PATH, PROCESS_NUM
-from utils.json_util import load_from_json
 
 
 # @Time : 2023/11/21 16:45
@@ -36,11 +35,19 @@ def get_decompress_target_path(path):
         name_version, release_arch = file_name.split("-")
         name, version = name_version.split("_")
         release, arch = release_arch.split("_")
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, name, version, "binary", release, arch)
+        if name.startswith("lib"):
+            category = name[:4]
+        else:
+            category = name[:1]
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category, name, version, "binary", release, arch)
 
     else:
         name, version = file_name.split("_")
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, name, version, "source")
+        if name.startswith("lib"):
+            category = name[:4]
+        else:
+            category = name[:1]
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category, name, version, "source")
 
 
 def find_data_tar_gz(dir_path):

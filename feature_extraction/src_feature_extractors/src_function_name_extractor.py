@@ -6,16 +6,16 @@
 # @Author : Liu Chengyue
 # @File : source_code_string_extractor.py
 # @Software: PyCharm
-from main.entities import FileFeature
-from main.extractors.extractor import FeatureExtractor, NodeType
+from feature_extraction.entities import FileFeature
+from feature_extraction.src_feature_extractors.base_extractor import SrcFeatureExtractor, NodeType
 
 
-class SrcFunctionNameExtractor(FeatureExtractor):
+class SrcFunctionNameExtractor(SrcFeatureExtractor):
 
-    def extract_file_feature(self, file_path, node) -> FileFeature:
+    def extract_file_feature(self, file_path, root_node) -> FileFeature:
 
         # 提取字符串
-        strings = self.traverse_node(node)
+        strings = self.traverse_node(root_node)
 
         # 组成特征
         file_feature = FileFeature(
