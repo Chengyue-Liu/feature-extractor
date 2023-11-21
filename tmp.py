@@ -8,5 +8,5 @@ from data_preparation.file_path_manager import is_src_package
 with open("/Users/liuchengyue/Desktop/works/feature_analysis/feature-extractor/test_cases/ls-lR") as f:
     lines = f.readlines()
     for line in lines:
-        if "orig.tar" not in line and line.endswith('.tar.gz'):
+        if line.endswith('.tar.xz') and not line.endswith('.debian.tar.xz'):
             print(line)
