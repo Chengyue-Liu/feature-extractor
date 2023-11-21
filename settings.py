@@ -4,6 +4,9 @@
 # @Time : 2023/11/21 16:48
 # @Author : Liu Chengyue
 
+from environs import Env
 
+env = Env()
+env.read_env()
 
-DEBIAN_FILE_DIR_PATH = ""
+DEBIAN_FILE_DIR_PATH = env.str("DEBIAN_FILE_DIR_PATH")
