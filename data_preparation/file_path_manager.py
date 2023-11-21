@@ -20,7 +20,10 @@ def is_src_package(file_name):
 
 
 def is_bin_package(file_name):
-    pass
+    if file_name.endswith('.deb') or file_name.endswith('.udeb'):
+        return True
+
+    return False
 
 
 def parse_info_from_file_name(file_name):
