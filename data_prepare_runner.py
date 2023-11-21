@@ -7,5 +7,6 @@ from data_preparation.file_path_manager import get_tar_file_paths
 # @Author : Liu Chengyue
 
 
-def main():
+if __name__ == '__main__':
+
     get_tar_file_paths()

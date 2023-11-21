@@ -35,3 +35,4 @@ def get_tar_file_paths():
                 bin_tar_paths.append(f_path)
     logger.info(f"walk finished. all count = {count}")
     return src_tar_paths, bin_tar_paths
+
