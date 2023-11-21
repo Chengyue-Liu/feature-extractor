@@ -6,6 +6,8 @@
 # @Author : Liu Chengyue
 # @File : source_code_string_extractor.py
 # @Software: PyCharm
+
+
 from feature_extraction.entities import FileFeature
 from feature_extraction.src_feature_extractors.base_extractor import SrcFeatureExtractor, NodeType
 
