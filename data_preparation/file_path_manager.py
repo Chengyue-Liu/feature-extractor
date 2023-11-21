@@ -11,7 +11,7 @@ from tqdm import tqdm
 # @Time : 2023/11/21 16:48
 # @Author : Liu Chengyue
 def is_src_package(file_name):
-    if "orig.tar" in file_name \
+    if ("orig.tar" in file_name and not file_name.endswith('sc')) \
             or file_name.endswith('.tar.gz') \
             or (file_name.endswith('.tar.xz') and not file_name.endswith('.debian.tar.xz')):
         return True
@@ -24,12 +24,6 @@ def is_bin_package(file_name):
         return True
 
     return False
-
-
-def parse_src_info(file_name):
-    package_name, version = file_name
-    pass
-
 
 def get_tar_file_paths():
     src_tar_paths = []
