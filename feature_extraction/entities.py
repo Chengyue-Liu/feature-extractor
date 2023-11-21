@@ -134,9 +134,9 @@ class Task:
 
 @dataclasses.dataclass
 class FileFeature:
-    def __init__(self, file_path: str, features: list):
+    def __init__(self, file_path: str, features):
         self.file_path: str = file_path
-        self.features: list = features
+        self.features = features
 
     def custom_serialize(self):
         return {

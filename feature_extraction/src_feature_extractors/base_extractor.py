@@ -115,7 +115,7 @@ class SrcFeatureExtractor:
 
         results = pool.imap_unordered(self.extract_repo_feature, self.tasks)
 
-        for _ in tqdm(results, total=len(self.tasks), desc="multiple run extract repo features"):
+        for _ in tqdm(results, total=len(self.tasks), desc="multiple run extract source features"):
             pass
         pool.close()
         pool.join()

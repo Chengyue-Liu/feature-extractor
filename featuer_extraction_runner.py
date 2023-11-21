@@ -13,19 +13,15 @@ from feature_extraction.bin_feature_extractors.bin_string_extractors import BinS
 
 from feature_extraction.decrators import timing_decorator, log_decorator
 from feature_extraction.entities import Task
+from feature_extraction.src_feature_extractors.src_string_extractor import SrcStringAndFunctionNameExtractor
 from feature_extraction.src_feature_extractors.src_function_name_extractor import SrcFunctionNameExtractor
-from feature_extraction.src_feature_extractors.src_string_extractor import SrcStringExtractor
 from settings import SRC_TASKS_JSON, BIN_TASKS_JSON
 
 
 @timing_decorator
 def run_src_extractor(tasks: List[Task]):
-    logger.info(f"SrcStringExtractor, task num: {len(tasks)}")
-    extractor = SrcStringExtractor(tasks)
-    extractor.multiple_run()
-
-    logger.info(f"SrcFunctionNameExtractor, task num: {len(tasks)}")
-    extractor = SrcFunctionNameExtractor(tasks)
+    logger.info(f"SrcStringAndFunctionNameExtractor, task num: {len(tasks)}")
+    extractor = SrcStringAndFunctionNameExtractor(tasks)
     extractor.multiple_run()
 
 
