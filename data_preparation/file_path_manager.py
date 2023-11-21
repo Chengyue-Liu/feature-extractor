@@ -27,7 +27,10 @@ def get_tar_file_paths():
     count = 0
     for root, dirs, files in os.walk(DEBIAN_FILE_DIR_PATH):
         for f_name in files:
-            logger.info(f"walk progress: {count}")
+            count += 1
+            if count % 1000 == 0:
+                logger.info(f"walk progress: {count}")
+
             f_path = os.path.join(root, f_name)
             if is_src_package(f_name):
                 src_tar_paths.append(f_path)
@@ -35,4 +38,3 @@ def get_tar_file_paths():
                 bin_tar_paths.append(f_path)
     logger.info(f"walk finished. all count = {count}")
     return src_tar_paths, bin_tar_paths
-
