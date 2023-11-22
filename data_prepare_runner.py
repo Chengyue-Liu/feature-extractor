@@ -13,9 +13,10 @@ if __name__ == '__main__':
     dump_to_json(src_tar_paths, "/root/DATA/liuchengyue/feature-extractor/src_tar_paths.json")
     dump_to_json(bin_tar_paths, "/root/DATA/liuchengyue/feature-extractor/bin_tar_paths.json")
 
-    multiple_decompress(src_tar_paths, bin_tar_paths)
+    # multiple_decompress(src_tar_paths, bin_tar_paths)
     """
     nohup python data_prepare_runner.py &
     
     ps aux | grep "python data_prepare_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
+    ps aux | grep "unar" | grep -v grep | awk '{print $2}' | xargs kill
     """
