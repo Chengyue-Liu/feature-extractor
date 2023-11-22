@@ -19,4 +19,5 @@ if __name__ == '__main__':
     
     ps aux | grep "python data_prepare_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
     ps aux | grep "unar" | grep -v grep | awk '{print $2}' | xargs kill
+    ps aux | grep "rm -rf" | grep -v grep | awk '{print $2}' | xargs kill
     """
