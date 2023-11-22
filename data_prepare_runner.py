@@ -10,8 +10,8 @@ from utils.json_util import dump_to_json
 
 if __name__ == '__main__':
     src_tar_paths, bin_tar_paths = get_tar_file_paths()
-    dump_to_json(src_tar_paths, "src_tar_paths.json")
-    dump_to_json(bin_tar_paths, "bin_tar_paths.json")
+    dump_to_json(src_tar_paths, "/root/DATA/liuchengyue/feature-extractor/src_tar_paths.json")
+    dump_to_json(bin_tar_paths, "/root/DATA/liuchengyue/feature-extractor/bin_tar_paths.json")
 
     multiple_decompress(src_tar_paths, bin_tar_paths)
     """
