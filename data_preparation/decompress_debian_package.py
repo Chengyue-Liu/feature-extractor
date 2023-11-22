@@ -103,7 +103,7 @@ def multiple_decompress(src_tar_paths: List[str], bin_tar_paths: List[str]):
 
     # 多进程并发提取
     results = pool.imap_unordered(decompress, src_tar_paths)
-    for _ in tqdm(results, total=len(src_tar_paths), desc="unar_decompress"):
+    for _ in tqdm(results, total=len(src_tar_paths[:100]), desc="unar_decompress"):
         pass
     pool.close()
     pool.join()
