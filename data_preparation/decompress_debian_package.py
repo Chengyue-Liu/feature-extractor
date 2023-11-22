@@ -47,6 +47,7 @@ def get_decompress_target_path(path):
         print(path)
         raise
 
+
 def find_data_tar_gz(dir_path):
     for root, dirs, files in os.walk(dir_path):
         for f in files:
@@ -56,8 +57,12 @@ def find_data_tar_gz(dir_path):
 
 
 def unar(archive_path, target_dir):
-    command = f"unar {archive_path} -o {target_dir}  -q"
-    subprocess.run(command, shell=True, check=True)
+    try:
+        command = f"unar {archive_path} -o {target_dir}  -q"
+        subprocess.run(command, shell=True, check=True)
+    except Exception as e:
+        logger.error(f"error occurred when unar {archive_path} to {target_dir}. error: {e}")
+        logger.error(traceback.format_exc())
 
 
 def decompress(archive_path):
