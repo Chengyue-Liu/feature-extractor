@@ -16,39 +16,36 @@ from settings import DEBIAN_TAR_FILE_DIR_PATH, DECOMPRESSED_DEBIAN_FILE_DIR_PATH
 # @Time : 2023/11/21 16:45
 # @Author : Liu Chengyue
 
-def parse_file_name(file_path: str):
-    file_name = os.path.split(file_path)[-1]
-    if "orig" in file_name:
-        return file_name.split(".orig")[0]
-    elif ".deb" in file_name:
-        return file_name[:-4]
-    elif ".udeb" in file_name:
-        return file_name[:-5]
+def get_category(lib_name):
+    if lib_name.startswith("lib"):
+        category = lib_name[:4]
     else:
-        return file_name
+        category = lib_name[:1]
+    return category
 
 
 def get_decompress_target_path(path):
     # 获取名称
-    file_name = parse_file_name(path)
-    if "-" in file_name:
-        name_version, release_arch = file_name.split("-")
-        name, version = name_version.split("_")
-        release, arch = release_arch.split("_")
-        if name.startswith("lib"):
-            category = name[:4]
+    file_name = os.path.split(path)[-1]
+    if ".orig" in file_name:
+        file_name = file_name.split(".orig")[0]
+        lib_name, lib_version = file_name.split("_")
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, get_category(lib_name), lib_name, lib_version, "source")
+    elif file_name.endswith(".tar.gz") or file_name.endswith(".tar.xz"):
+        lib_name, lib_version = file_name.split("_")
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, get_category(lib_name), lib_name, lib_version, "source")
+    elif file_name.endswith(".deb") or file_name.endswith(".udeb"):
+        file_name, extension = os.path.splitext(file_name)
+        lib_name, lib_version_release, lib_arch = file_name.split("_")
+        if "-" in lib_version_release:
+            lib_version, lib_release = lib_version_release.split("-", 1)
         else:
-            category = name[:1]
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category, name, version, "binary", release, arch)
-
+            lib_version, lib_release = lib_version_release, "0"
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, get_category(lib_name), lib_name, lib_version, "binary",
+                            lib_release, lib_release)
     else:
-        name, version = file_name.split("_")
-        if name.startswith("lib"):
-            category = name[:4]
-        else:
-            category = name[:1]
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category, name, version, "source")
-
+        print(path)
+        raise
 
 def find_data_tar_gz(dir_path):
     for root, dirs, files in os.walk(dir_path):
