@@ -14,7 +14,6 @@ from feature_extraction.bin_feature_extractors.bin_string_extractors import BinS
 from feature_extraction.decrators import timing_decorator, log_decorator
 from feature_extraction.entities import Task
 from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import SrcStringAndFunctionNameExtractor
-from feature_extraction.src_feature_extractors.src_function_name_extractor import SrcFunctionNameExtractor
 from settings import SRC_TASKS_JSON, BIN_TASKS_JSON
 
 

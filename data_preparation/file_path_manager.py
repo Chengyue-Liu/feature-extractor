@@ -43,6 +43,3 @@ def get_tar_file_paths():
     logger.success(f"src_tar_paths num: {len(src_tar_paths)}, bin_tar_paths num: {len(bin_tar_paths)}")
     return src_tar_paths, bin_tar_paths
 
-
-def random_select_100():
-    src_tar_paths, bin_tar_paths = get_tar_file_paths()
