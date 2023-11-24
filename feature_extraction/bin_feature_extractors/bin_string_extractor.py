@@ -3,7 +3,7 @@
 import subprocess
 from abc import ABC
 
-from feature_extraction.bin_feature_extractors.base_extractor import BinFeatureExtractor
+from feature_extraction.bin_feature_extractors.bin_feature_extractor import BinFeatureExtractor
 from feature_extraction.entities import FileFeature
 
 

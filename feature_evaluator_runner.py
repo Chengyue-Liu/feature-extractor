@@ -6,7 +6,7 @@ from typing import List
 from loguru import logger
 
 from feature_evaluation.bin_string_evaluator import BinStringEvaluator
-from feature_extraction.bin_feature_extractors.bin_string_extractors import BinStringExtractor
+from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 # @Time : 2023/11/3 12:06
 # @Author : Liu Chengyue
 # @File : extractor_runner.py

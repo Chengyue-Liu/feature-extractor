@@ -9,7 +9,7 @@
 
 
 from feature_extraction.entities import FileFeature
-from feature_extraction.src_feature_extractors.base_extractor import SrcFeatureExtractor, NodeType
+from feature_extraction.src_feature_extractors.src_feature_extractor import SrcFeatureExtractor, NodeType
 
 
 class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):

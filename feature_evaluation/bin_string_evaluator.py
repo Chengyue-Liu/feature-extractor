@@ -5,7 +5,7 @@ from abc import ABC
 from typing import Set
 
 from feature_evaluation.feature_evaluator import FeatureEvaluator
-from feature_extraction.bin_feature_extractors.bin_string_extractors import BinStringExtractor
+from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from settings import FEATURE_RESULT_DIR
 
 
