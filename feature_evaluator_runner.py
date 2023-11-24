@@ -5,6 +5,7 @@ from typing import List
 
 from loguru import logger
 
+from feature_evaluation.bin_string_evaluator import BinStringEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractors import BinStringExtractor
 # @Time : 2023/11/3 12:06
 # @Author : Liu Chengyue
@@ -17,30 +18,11 @@ from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extra
 from settings import SRC_TASKS_JSON, BIN_TASKS_JSON
 
 
-@timing_decorator
-def run_src_extractor(tasks: List[Task]):
-    logger.info(f"SrcStringAndFunctionNameExtractor, task num: {len(tasks)}")
-    extractor = SrcStringAndFunctionNameExtractor(tasks)
-    extractor.multiple_run()
-
-
-@timing_decorator
-def run_bin_extractor(tasks: List[Task]):
-    logger.info(f"BinStringExtractor, task num: {len(tasks)}")
-    extractor = BinStringExtractor(tasks)
-    extractor.multiple_run()
-
 
 def main():
     # 生成任务
-    Task.generate_tasks_json()
-
-    # 初始化任务
-    src_tasks = Task.init_tasks_from_json_file(SRC_TASKS_JSON)
-    bin_tasks = Task.init_tasks_from_json_file(BIN_TASKS_JSON)
-
-    run_bin_extractor(bin_tasks)
-    run_src_extractor(src_tasks)
+    evaluator = BinStringEvaluator()
+    evaluator.evaluate()
 
 
 if __name__ == '__main__':

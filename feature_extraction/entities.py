@@ -79,7 +79,7 @@ class Task:
                                 pbar.update(1)
                                 src_task = Task(
                                     repo_path=arch_path,
-                                    repo_type="source",
+                                    repo_type="binary",
                                     repo_id=repo_id,
                                     repo_name=library_name,
                                     version_id=version_id,
@@ -97,23 +97,27 @@ class Task:
         logger.info(f"all finished.")
 
     @classmethod
-    def init_tasks_from_json(cls, json_path):
+    def init_task_from_json_data(cls, json_task):
+        task = Task(
+            repo_path=json_task["repo_path"],
+            repo_type=json_task["repo_type"],
+            repo_id=json_task["repo_id"],
+            repo_name=json_task["repo_name"],
+            repo_version=json_task["repo_version"],
+            version_id=json_task["version_id"],
+            repo_release=json_task["repo_release"],
+            release_id=json_task["release_id"],
+            repo_arch=json_task["repo_arch"],
+            arch_id=json_task["arch_id"],
+        )
+        return task
+
+    @classmethod
+    def init_tasks_from_json_file(cls, json_path):
         json_tasks = load_from_json(json_path)
         tasks = []
         for json_task in json_tasks:
-            task = Task(
-                repo_path=json_task["repo_path"],
-                repo_type=json_task["repo_type"],
-                repo_id=json_task["repo_id"],
-                repo_name=json_task["repo_name"],
-                repo_version=json_task["repo_version"],
-                version_id=json_task["version_id"],
-                repo_release=json_task["repo_release"],
-                release_id=json_task["release_id"],
-                repo_arch=json_task["repo_arch"],
-                arch_id=json_task["arch_id"],
-            )
-            tasks.append(task)
+            tasks.append(cls.init_task_from_json_data(json_task))
         return tasks
 
     def custom_serialize(self):
@@ -121,14 +125,13 @@ class Task:
             "repo_path": self.repo_path,
             "repo_type": self.repo_type,
             "repo_id": self.repo_id,
-            "repo_name": self.repo_name,
             "version_id": self.version_id,
-            "repo_version": self.repo_version,
             "release_id": self.release_id,
-            "repo_release": self.repo_release,
             "arch_id": self.arch_id,
+            "repo_name": self.repo_name,
+            "repo_version": self.repo_version,
+            "repo_release": self.repo_release,
             "repo_arch": self.repo_arch,
-
         }
 
 
@@ -154,5 +157,5 @@ class RepoFeature:
     def custom_serialize(self):
         return {
             "task": self.task.custom_serialize(),
-            "feature_dict": [ff.custom_serialize() for ff in self.file_features],
+            "file_features": [ff.custom_serialize() for ff in self.file_features],
         }
