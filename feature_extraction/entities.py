@@ -8,6 +8,7 @@
 # @Software: PyCharm
 import dataclasses
 import enum
+import json
 import os
 from dataclasses import dataclass
 from typing import List
@@ -15,12 +16,12 @@ from typing import List
 from loguru import logger
 from tqdm import tqdm
 
-from settings import DECOMPRESSED_DEBIAN_FILE_DIR_PATH, SRC_TASKS_JSON, BIN_TASKS_JSON
+from settings import DECOMPRESSED_DEBIAN_FILE_DIR_PATH, SRC_REPOS_JSON, BIN_REPOS_JSON
 from utils.json_util import dump_to_json, load_from_json
 
 
 @dataclasses.dataclass
-class Task:
+class Repository:
     def __init__(self,
                  repo_path, repo_type,
                  repo_id, version_id, repo_name, repo_version,
@@ -41,9 +42,9 @@ class Task:
         self.repo_arch = repo_arch
 
     @classmethod
-    def generate_tasks_json(cls):
-        src_tasks = []
-        bin_tasks = []
+    def generate_repositories_json(cls):
+        src_repos = []
+        bin_repos = []
         repo_id = 0
         version_id = 0
         release_id = 0
@@ -60,7 +61,7 @@ class Task:
                         version_id += 1
                         src_path = os.path.join(library_path, version_number, "source")
                         pbar.update(1)
-                        src_task = Task(
+                        bin_repo = Repository(
                             repo_path=src_path,
                             repo_type="source",
                             repo_id=repo_id,
@@ -68,7 +69,7 @@ class Task:
                             version_id=version_id,
                             repo_version=version_number,
                         )
-                        src_tasks.append(src_task)
+                        src_repos.append(bin_repo)
                         binary_path = os.path.join(library_path, version_number, "binary")
                         for release_number in os.listdir(binary_path):
                             release_id += 1
@@ -77,7 +78,7 @@ class Task:
                                 arch_id += 1
                                 arch_path = os.path.join(release_path, arch_name)
                                 pbar.update(1)
-                                src_task = Task(
+                                bin_repo = Repository(
                                     repo_path=arch_path,
                                     repo_type="binary",
                                     repo_id=repo_id,
@@ -89,16 +90,16 @@ class Task:
                                     arch_id=arch_id,
                                     repo_arch=arch_name
                                 )
-                                bin_tasks.append(src_task)
+                                bin_repos.append(bin_repo)
 
         logger.info(f"saving json ...")
-        dump_to_json([task.custom_serialize() for task in src_tasks], SRC_TASKS_JSON)
-        dump_to_json([task.custom_serialize() for task in bin_tasks], BIN_TASKS_JSON)
+        dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
+        dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
         logger.info(f"all finished.")
 
     @classmethod
-    def init_task_from_json_data(cls, json_task):
-        task = Task(
+    def init_repository_from_json_data(cls, json_task):
+        repository = Repository(
             repo_path=json_task["repo_path"],
             repo_type=json_task["repo_type"],
             repo_id=json_task["repo_id"],
@@ -110,14 +111,14 @@ class Task:
             repo_arch=json_task["repo_arch"],
             arch_id=json_task["arch_id"],
         )
-        return task
+        return repository
 
     @classmethod
-    def init_tasks_from_json_file(cls, json_path):
-        json_tasks = load_from_json(json_path)
+    def init_repositories_from_json_file(cls, json_path):
+        json_repositories = load_from_json(json_path)
         tasks = []
-        for json_task in json_tasks:
-            tasks.append(cls.init_task_from_json_data(json_task))
+        for json_repository in json_repositories:
+            tasks.append(cls.init_repository_from_json_data(json_repository))
         return tasks
 
     def custom_serialize(self):
@@ -137,25 +138,44 @@ class Task:
 
 @dataclasses.dataclass
 class FileFeature:
-    def __init__(self, file_path: str, features):
+    def __init__(self, file_path: str, feature):
         self.file_path: str = file_path
-        self.features = features
+        self.feature = feature
 
     def custom_serialize(self):
         return {
             "file_path": self.file_path,
-            "features": self.features,
+            "feature": self.feature,
         }
+
+    @classmethod
+    def init_file_feature_from_json_data(self, json_data):
+        return FileFeature(
+            file_path=json_data['file_path'],
+            feature=json_data['feature']
+        )
 
 
 @dataclasses.dataclass
 class RepoFeature:
-    def __init__(self, task: Task, file_features: List[FileFeature]):
-        self.task: Task = task
+    def __init__(self, repository: Repository, file_features: List[FileFeature]):
+        self.repository: Repository = repository
         self.file_features: List[FileFeature] = file_features
 
     def custom_serialize(self):
         return {
-            "task": self.task.custom_serialize(),
+            "repository": self.repository.custom_serialize(),
             "file_features": [ff.custom_serialize() for ff in self.file_features],
         }
+
+    @classmethod
+    def init_repo_feature_from_json_file(self, json_path):
+        with open(json_path) as f:
+            data = json.load(f)
+            repository = Repository.init_repository_from_json_data(data["repository"])
+            file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json in
+                             data['file_features']]
+            return RepoFeature(
+                repository=repository,
+                file_features=file_features
+            )

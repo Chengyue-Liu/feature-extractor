@@ -20,8 +20,11 @@ DECOMPRESSED_DEBIAN_FILE_DIR_PATH = env.str("DECOMPRESSED_DEBIAN_FILE_DIR_PATH")
 # feature extraction
 LANGUAGE_SO_FILE_PATH = env.str("LANGUAGE_SO_FILE_PATH", "resources/build/my-languages-mac.so")
 
-SRC_TASKS_JSON = env.str("SRC_TASKS_JSON", "resources/tasks/src_tasks.json")
-BIN_TASKS_JSON = env.str("BIN_TASKS_JSON", "resources/tasks/bin_tasks.json")
+SRC_REPOS_JSON = env.str("SRC_REPOS_JSON", "resources/repository_json/src_repos.json")
+BIN_REPOS_JSON = env.str("BIN_REPOS_JSON", "resources/repository_json/bin_repos.json")
 
 FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
 
+# feature evaluation
+# bin string sca threshold
+BIN_STRING_SCA_THRESHOLD = 0.6

@@ -13,9 +13,9 @@ from feature_extraction.bin_feature_extractors.bin_string_extractor import BinSt
 # @Software: PyCharm
 
 from feature_extraction.decrators import timing_decorator, log_decorator
-from feature_extraction.entities import Task
+from feature_extraction.entities import Repository
 from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import SrcStringAndFunctionNameExtractor
-from settings import SRC_TASKS_JSON, BIN_TASKS_JSON
+from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
 
 
 

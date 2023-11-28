@@ -12,35 +12,36 @@ from feature_extraction.bin_feature_extractors.bin_string_extractor import BinSt
 # @Software: PyCharm
 
 from feature_extraction.decrators import timing_decorator, log_decorator
-from feature_extraction.entities import Task
+from feature_extraction.entities import Repository
 from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import SrcStringAndFunctionNameExtractor
-from settings import SRC_TASKS_JSON, BIN_TASKS_JSON
+from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
 
 
 @timing_decorator
-def run_src_extractor(tasks: List[Task]):
+def run_src_extractor(tasks: List[Repository]):
     logger.info(f"SrcStringAndFunctionNameExtractor, task num: {len(tasks)}")
     extractor = SrcStringAndFunctionNameExtractor(tasks)
     extractor.multiple_run()
 
 
 @timing_decorator
-def run_bin_extractor(tasks: List[Task]):
-    logger.info(f"BinStringExtractor, task num: {len(tasks)}")
-    extractor = BinStringExtractor(tasks)
+def run_bin_extractor(repos: List[Repository]):
+    logger.info(f"BinStringExtractor, task num: {len(repos)}")
+    extractor = BinStringExtractor(repos)
     extractor.multiple_run()
 
 
 def main():
-    # 生成任务
-    Task.generate_tasks_json()
+    # 生成json信息
+    Repository.generate_repositories_json()
 
-    # 初始化任务
-    src_tasks = Task.init_tasks_from_json_file(SRC_TASKS_JSON)
-    bin_tasks = Task.init_tasks_from_json_file(BIN_TASKS_JSON)
+    # 从json信息初始化
+    bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
+    # src_repos = Repository.init_tasks_from_json_file(SRC_REPOS_JSON)
 
-    run_bin_extractor(bin_tasks)
-    run_src_extractor(src_tasks)
+    # 提取
+    run_bin_extractor(bin_repos)
+    # run_src_extractor(src_repos)
 
 
 if __name__ == '__main__':

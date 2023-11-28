@@ -21,7 +21,7 @@ class BinStringExtractor(BinFeatureExtractor, ABC):
 
         file_feature = FileFeature(
             file_path=path,
-            features=strings
+            feature=strings
         )
 
         return file_feature

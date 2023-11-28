@@ -7,7 +7,7 @@ from typing import List
 
 from tqdm import tqdm
 
-from feature_extraction.entities import Task, RepoFeature, FileFeature
+from feature_extraction.entities import Repository, RepoFeature, FileFeature
 from settings import PROCESS_NUM, FEATURE_RESULT_DIR
 from utils.json_util import dump_to_json
 
@@ -18,8 +18,8 @@ from utils.json_util import dump_to_json
 
 class BinFeatureExtractor:
 
-    def __init__(self, tasks: List[Task]):
-        self.tasks = tasks
+    def __init__(self, repositories: List[Repository]):
+        self.repositories = repositories
         self.result_dir = os.path.join(FEATURE_RESULT_DIR, self.__class__.__name__)
         os.makedirs(self.result_dir, exist_ok=True)
 
@@ -44,29 +44,29 @@ class BinFeatureExtractor:
                     elf_files.append(file_path)
         return elf_files
 
-    def extract_repo_feature(self, task):
+    def extract_repo_feature(self, repository):
         # 找到目标文件
-        elf_paths = self.find_elf_files(task.repo_path)
+        elf_paths = self.find_elf_files(repository.repo_path)
 
         # 提取文件特征
         file_features = [self.extract_file_feature(path) for path in elf_paths]
 
         # 生成仓库特征
         repo_feature = RepoFeature(
-            task=task,
+            repository=repository,
             file_features=file_features
         )
 
         # 保存特征
-        result_path = os.path.join(self.result_dir, f"{task.repo_id}-{task.version_id}-{task.release_id}-{task.arch_id}.json")
+        result_path = os.path.join(self.result_dir, f"{repository.repo_id}-{repository.version_id}-{repository.release_id}-{repository.arch_id}.json")
         dump_to_json(repo_feature.custom_serialize(), result_path)
 
     def multiple_run(self):
         pool = multiprocessing.Pool(processes=PROCESS_NUM)
 
-        results = pool.imap_unordered(self.extract_repo_feature, self.tasks)
+        results = pool.imap_unordered(self.extract_repo_feature, self.repositories)
 
-        for _ in tqdm(results, total=len(self.tasks), desc="multiple run extract binary features"):
+        for _ in tqdm(results, total=len(self.repositories), desc="multiple run extract binary features"):
             pass
         pool.close()
         pool.join()

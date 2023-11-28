@@ -13,7 +13,7 @@ from typing import List
 from tqdm import tqdm
 
 from feature_extraction.constants import TARGET_FILE_EXTENSION_SET
-from feature_extraction.entities import FileFeature, RepoFeature, Task
+from feature_extraction.entities import FileFeature, RepoFeature, Repository
 from settings import PROCESS_NUM, FEATURE_RESULT_DIR
 import enum
 
@@ -62,7 +62,7 @@ class SrcFeatureExtractor:
 
     """
 
-    def __init__(self, tasks: List[Task]):
+    def __init__(self, tasks: List[Repository]):
         self.tasks = tasks
         self.result_dir = os.path.join(FEATURE_RESULT_DIR, self.__class__.__name__)
         os.makedirs(self.result_dir, exist_ok=True)
@@ -77,7 +77,7 @@ class SrcFeatureExtractor:
         :return:
         """
 
-    def extract_repo_feature(self, task: Task):
+    def extract_repo_feature(self, task: Repository):
         """
         提取一个仓库特征的通用方法
         :param task:
@@ -98,7 +98,7 @@ class SrcFeatureExtractor:
 
         # 生成仓库特征
         repo_feature = RepoFeature(
-            task=task,
+            repository=task,
             file_features=file_features
         )
 

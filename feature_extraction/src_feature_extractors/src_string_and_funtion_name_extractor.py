@@ -24,7 +24,7 @@ class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
         # 组成特征
         file_feature = FileFeature(
             file_path=file_path,
-            features={
+            feature={
                 "strings": list(set(strings)),
                 "function_names": list(set(function_names)),
             }

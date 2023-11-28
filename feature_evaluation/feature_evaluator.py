@@ -1,45 +1,69 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# @Time : 2023/11/22 00:19
-# @Author : Liu Chengyue
-
-"""
-1. 构建一个特征库
-2. 遍历任务文件，进行扫描
-3. 看是否扫描到了自己
-"""
 import os
 from abc import abstractmethod
+from collections import Counter
 from typing import List, Set
 
-from feature_extraction.entities import Task
-from utils.json_util import load_from_json
+from feature_extraction.bin_feature_extractors.bin_feature_extractor import BinFeatureExtractor
+from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
+from feature_extraction.entities import RepoFeature, Repository
+from settings import FEATURE_RESULT_DIR
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from scipy.stats import norm
+
+
+# @Time : 2023/11/22 15:49
+# @Author : Liu Chengyue
 
 
 class FeatureEvaluator:
     def __init__(self):
-        self.tasks: List[Task] = []
-        self.repo_features: List = []
+        # feature json dir
+        self.feature_dir = os.path.join(FEATURE_RESULT_DIR, BinStringExtractor.__name__)
 
-    def load_task_and_features(self, feature_dir):
-        """
-        加载任务和特征
-        :param feature_dir:
-        :return:
-        """
-        for file_name in os.listdir(feature_dir):
-            if file_name.endswith(".json"):
-                repo_feature = load_from_json(os.path.join(feature_dir, file_name))
+        # repo features
+        self.repo_features: List[RepoFeature] = self.init_repo_features()
 
-                task_json = repo_feature["task"]
-                task = Task.init_task_from_json_data(task_json)
-                self.tasks.append(task)
-                self.repo_features.append(repo_feature)
+    def init_repo_features(self):
+        repo_features = []
+        for f in os.listdir(self.feature_dir):
+            if f.endswith('.json'):
+                f_path = os.path.join(self.feature_dir, f)
+                repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+        return repo_features
 
-    @abstractmethod
-    def detect(self):
-        pass
+    def statistic(self, data, data_desc):
+        if not data_desc:
+            data_desc = "statistic_in_repo_view"
+        # 计算均值
+        mean_value = np.mean(data)
+
+        # 计算最小值
+        min_value = np.min(data)
+
+        # 计算最大值
+        max_value = np.max(data)
+
+        # 计算中位数
+        median_value = np.median(data)
+
+        # 计算四分位数
+        q1 = np.percentile(data, 25)
+        q3 = np.percentile(data, 75)
+
+        # 输出统计结果
+        print(data_desc)
+        print("均值:", mean_value)
+        print("最小值:", min_value)
+        print("最大值:", max_value)
+        print("中位数:", median_value)
+        print("第一四分位数 (Q1):", q1)
+        print("第三四分位数 (Q3):", q3)
+        print()
+
 
     @abstractmethod
     def evaluate(self):
