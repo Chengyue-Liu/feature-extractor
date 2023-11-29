@@ -4,6 +4,8 @@ import os
 from collections import Counter
 from typing import List
 
+from loguru import logger
+
 from feature_evaluation.entities import BinStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
@@ -17,6 +19,7 @@ from utils.elf_utils import extract_elf_strings
 
 class BinStringEvaluator(FeatureEvaluator):
     def __init__(self):
+        logger.info(f"{self.__class__.__name__} initing...")
         # bin_string_features
         super().__init__(BinStringExtractor.__name__)
 
@@ -49,7 +52,7 @@ class BinStringEvaluator(FeatureEvaluator):
                 if not (repo_version_id_set := self.string_repo_version_dict.get(string)):
                     self.string_repo_version_dict[string] = repo_version_id_set = set()
                 repo_version_id_set.add((repo_id, version_id))
-
+        logger.info(f"{self.__class__.__name__} inited")
     def evaluate(self):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]

@@ -46,7 +46,7 @@ def main():
     # 二进制字符串
     run_bin_extractor(bin_repos)
     # 源码字符串
-    # run_src_extractor(src_repos)
+    run_src_extractor(src_repos)
 
     logger.info("all done.")
 

@@ -23,8 +23,10 @@ from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
 def main():
     # 生成任务
     evaluator = BinStringEvaluator()
-    # evaluator = SrcStringEvaluator()
     evaluator.evaluate()
+    evaluator = SrcStringEvaluator()
+    evaluator.evaluate()
+
 
 
 if __name__ == '__main__':

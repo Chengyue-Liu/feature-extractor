@@ -2,17 +2,16 @@
 # -*- coding: utf-8 -*-
 import os
 from collections import Counter
-from typing import List, Set
 
-from feature_evaluation.entities import SrcStringFeature, BinStringFeature
+from loguru import logger
+
+from feature_evaluation.entities import SrcStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
-from feature_extraction.entities import RepoFeature, Repository
 from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
     SrcStringAndFunctionNameExtractor
-from settings import BIN_STRING_SCA_THRESHOLD, BIN_REPOS_JSON, SRC_STRING_SCA_THRESHOLD
+from settings import SRC_STRING_SCA_THRESHOLD
 from utils.elf_utils import extract_elf_strings
-from utils.json_util import load_from_json
 
 
 # @Time : 2023/11/22 15:49
@@ -21,6 +20,7 @@ from utils.json_util import load_from_json
 
 class SrcStringEvaluator(FeatureEvaluator):
     def __init__(self):
+        logger.info(f"{self.__class__.__name__} initing...")
         # bin_string_features
         super().__init__(SrcStringAndFunctionNameExtractor.__name__)
 
@@ -53,7 +53,7 @@ class SrcStringEvaluator(FeatureEvaluator):
                 if not (repo_version_id_set := self.string_repo_version_dict.get(string)):
                     self.string_repo_version_dict[string] = repo_version_id_set = set()
                 repo_version_id_set.add((repo_id, version_id))
-
+        logger.info(f"{self.__class__.__name__} inited...")
     def evaluate(self):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
@@ -93,8 +93,6 @@ class SrcStringEvaluator(FeatureEvaluator):
                 print(file_name, percent)
 
         return filtered_results
-
-
 
     def sca_evaluate(self):
         # walk all binaries
