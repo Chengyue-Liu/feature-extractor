@@ -33,15 +33,20 @@ def run_bin_extractor(repos: List[Repository]):
 
 def main():
     # 生成json信息
+    logger.info(f"生成json信息")
     Repository.generate_repositories_json()
 
     # 从json信息初始化
+    logger.info(f"从json信息初始化")
     bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
     # src_repos = Repository.init_tasks_from_json_file(SRC_REPOS_JSON)
 
-    # 提取
+    # 提取特征
+    logger.info(f"提取特征")
     run_bin_extractor(bin_repos)
     # run_src_extractor(src_repos)
+
+    logger.info("all done.")
 
 
 if __name__ == '__main__':
