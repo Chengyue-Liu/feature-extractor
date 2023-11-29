@@ -2,43 +2,47 @@
 # -*- coding: utf-8 -*-
 import os
 from collections import Counter
-from typing import List
+from typing import List, Set
 
-from feature_evaluation.entities import BinStringFeature
+from feature_evaluation.entities import SrcStringFeature, BinStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
-from settings import BIN_STRING_SCA_THRESHOLD
+from feature_extraction.entities import RepoFeature, Repository
+from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
+    SrcStringAndFunctionNameExtractor
+from settings import BIN_STRING_SCA_THRESHOLD, BIN_REPOS_JSON, SRC_STRING_SCA_THRESHOLD
 from utils.elf_utils import extract_elf_strings
+from utils.json_util import load_from_json
 
 
 # @Time : 2023/11/22 15:49
 # @Author : Liu Chengyue
 
 
-class BinStringEvaluator(FeatureEvaluator):
+class SrcStringEvaluator(FeatureEvaluator):
     def __init__(self):
         # bin_string_features
-        super().__init__(BinStringExtractor.__name__)
+        super().__init__(SrcStringAndFunctionNameExtractor.__name__)
 
         # 转换特征
-        self.bin_string_feature_dict = dict()
+        self.src_string_feature_dict = dict()
         for repo_feature in self.repo_features:
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
-            if not self.bin_string_feature_dict.get(key):
-                self.bin_string_feature_dict[key] = BinStringFeature(repo_feature)
+            if not self.src_string_feature_dict.get(key):
+                self.src_string_feature_dict[key] = SrcStringFeature(repo_feature)
             else:
-                self.bin_string_feature_dict[key].strings.update(BinStringFeature(repo_feature).strings)
+                self.src_string_feature_dict[key].strings.update(SrcStringFeature(repo_feature).strings)
 
-        # 计数
-        self.bin_string_num_dict = {
+        # 特征计数
+        self.src_string_num_dict = {
             key: len(strings.strings)
-            for key, strings in self.bin_string_feature_dict.items()
+            for key, strings in self.src_string_feature_dict.items()
         }
 
-        # string ---> bins
+        # 特征倒排索引表
         self.string_repo_dict = dict()
         self.string_repo_version_dict = dict()
-        for repo_feature in self.bin_string_feature_dict.values():
+        for repo_feature in self.src_string_feature_dict.values():
             repo_id = repo_feature.repository.repo_id
             version_id = repo_feature.repository.version_id
             for string in repo_feature.strings:
@@ -50,7 +54,7 @@ class BinStringEvaluator(FeatureEvaluator):
                     self.string_repo_version_dict[string] = repo_version_id_set = set()
                 repo_version_id_set.add((repo_id, version_id))
 
-        # result
+        # 扫描结果
         self.repo_sca_check_result = {
             "tp": 0,
             "fp": 0,
@@ -64,7 +68,7 @@ class BinStringEvaluator(FeatureEvaluator):
 
     def evaluate(self):
         # 分布统计
-        repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
+        repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
         self.statistic(repo_string_nums, "statistic_in_repo_view")
 
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
@@ -93,12 +97,15 @@ class BinStringEvaluator(FeatureEvaluator):
         filtered_results = []
         for (repo_id, version_id), count in all_results:
             key = f"{repo_id}-{version_id}"
-            string_num = self.bin_string_num_dict.get(key)
+            string_num = self.src_string_num_dict.get(key)
             percent = count / string_num
-            if percent > BIN_STRING_SCA_THRESHOLD:
+            if percent > SRC_STRING_SCA_THRESHOLD:
                 filtered_results.append((repo_id, version_id))
                 # 预览扫描结果
                 print(file_name, percent)
+
+        if not filtered_results:
+            filtered_results = [(None, None)]
         return filtered_results
 
     def check(self, ground_truth_repo_id,
@@ -120,8 +127,10 @@ class BinStringEvaluator(FeatureEvaluator):
                 self.version_sca_check_result["fp"] += 1
 
     def sca_evaluate(self):
+        # walk all binaries
+        fe = FeatureEvaluator(BinStringExtractor.__name__)
         # walk all feature
-        for repo_feature in self.repo_features:
+        for repo_feature in fe.repo_features:
             # get ground truth
             ground_truth_repo_id = repo_feature.repository.repo_id
             ground_truth_version_id = repo_feature.repository.repo_id

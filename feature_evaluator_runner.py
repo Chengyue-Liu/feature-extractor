@@ -6,6 +6,7 @@ from typing import List
 from loguru import logger
 
 from feature_evaluation.bin_string_evaluator import BinStringEvaluator
+from feature_evaluation.src_string_evaluator import SrcStringEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 # @Time : 2023/11/3 12:06
 # @Author : Liu Chengyue
@@ -21,7 +22,8 @@ from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
 
 def main():
     # 生成任务
-    evaluator = BinStringEvaluator()
+    # evaluator = BinStringEvaluator()
+    evaluator = SrcStringEvaluator()
     evaluator.evaluate()
 
 

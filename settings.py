@@ -28,3 +28,4 @@ FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
 # feature evaluation
 # bin string sca threshold
 BIN_STRING_SCA_THRESHOLD = 0.6
+SRC_STRING_SCA_THRESHOLD = 0.1

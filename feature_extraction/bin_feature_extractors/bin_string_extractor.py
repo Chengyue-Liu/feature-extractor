@@ -5,6 +5,7 @@ from abc import ABC
 
 from feature_extraction.bin_feature_extractors.bin_feature_extractor import BinFeatureExtractor
 from feature_extraction.entities import FileFeature
+from utils.elf_utils import extract_elf_strings
 
 
 # @Time : 2023/11/21 21:55
@@ -14,10 +15,7 @@ from feature_extraction.entities import FileFeature
 class BinStringExtractor(BinFeatureExtractor, ABC):
 
     def extract_file_feature(self, path: str) -> FileFeature:
-        cmd = f"strings {path}"
-        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        output = proc.stdout.decode()
-        strings = list({s for s in output.split("\n")})
+        strings = extract_elf_strings(path)
 
         file_feature = FileFeature(
             file_path=path,
