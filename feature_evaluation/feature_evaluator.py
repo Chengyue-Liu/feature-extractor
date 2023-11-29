@@ -2,17 +2,13 @@
 # -*- coding: utf-8 -*-
 import os
 from abc import abstractmethod
-from collections import Counter
-from typing import List, Set
+from typing import List
 
-from feature_extraction.bin_feature_extractors.bin_feature_extractor import BinFeatureExtractor
-from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
-from feature_extraction.entities import RepoFeature, Repository
-from settings import FEATURE_RESULT_DIR
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
-from scipy.stats import norm
+
+from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
+from feature_extraction.entities import RepoFeature
+from settings import FEATURE_RESULT_DIR
 
 
 # @Time : 2023/11/22 15:49
@@ -20,9 +16,9 @@ from scipy.stats import norm
 
 
 class FeatureEvaluator:
-    def __init__(self):
+    def __init__(self, extractor_name):
         # feature json dir
-        self.feature_dir = os.path.join(FEATURE_RESULT_DIR, BinStringExtractor.__name__)
+        self.feature_dir = os.path.join(FEATURE_RESULT_DIR, extractor_name)
 
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
@@ -63,7 +59,6 @@ class FeatureEvaluator:
         print("第一四分位数 (Q1):", q1)
         print("第三四分位数 (Q3):", q3)
         print()
-
 
     @abstractmethod
     def evaluate(self):

@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 from collections import Counter
 from typing import List, Set
 
 from feature_evaluation.feature_evaluator import FeatureEvaluator
-from feature_extraction.bin_feature_extractors.bin_feature_extractor import BinFeatureExtractor
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.entities import RepoFeature, Repository
-from settings import FEATURE_RESULT_DIR, BIN_STRING_SCA_THRESHOLD
-
-import numpy as np
+from settings import BIN_STRING_SCA_THRESHOLD
 
 
 # @Time : 2023/11/22 15:49
@@ -27,7 +23,7 @@ class BinStringFeature:
 class BinStringEvaluator(FeatureEvaluator):
     def __init__(self):
         # bin_string_features
-        super().__init__()
+        super().__init__(BinStringExtractor.__name__)
 
         # bin ---> strings
         self.bin_string_features: List[BinStringFeature] = [BinStringFeature(repo_feature)
@@ -77,19 +73,19 @@ class BinStringEvaluator(FeatureEvaluator):
     def sca(self, strings):
         string_repo_id_version_id_tuple_list = []
         for string in strings:
-            # repo level
             string_repo_id_version_id_tuple_list.extend(self.string_repo_version_dict.get(string, []))
-
         counter = Counter(string_repo_id_version_id_tuple_list)
-        (repo_id, version_id), count = counter.most_common(1)[0]
-        percent = count / len(strings)
-        if percent > BIN_STRING_SCA_THRESHOLD:
-            return repo_id, version_id
-        else:
-            return None, None
 
-    def check(self, ground_truth_repo_id, ground_truth_version_id,
-              sca_repo_id, sca_version_id):
+        all_results = counter.most_common(20)  # (repo_id, version_id), count
+        filtered_results = [(repo_id, version_id)
+                            for (repo_id, version_id), count in all_results
+                            if count / len(strings) > BIN_STRING_SCA_THRESHOLD]
+        return filtered_results
+
+    def check(self, ground_truth_repo_id,
+              ground_truth_version_id,
+              sca_repo_id,
+              sca_version_id):
         if not sca_repo_id:
             self.repo_sca_check_result["fn"] += 1
             self.version_sca_check_result["fn"] += 1
@@ -105,17 +101,28 @@ class BinStringEvaluator(FeatureEvaluator):
                 self.version_sca_check_result["fp"] += 1
 
     def sca_evaluate(self):
+        # walk all feature
         for bin_string_feature in self.bin_string_features:
+            # get ground truth
             ground_truth_repo_id = bin_string_feature.repository.repo_id
             ground_truth_version_id = bin_string_feature.repository.repo_id
+
+            # sca
             strings = bin_string_feature.strings
-            sca_repo_id, sca_version_id = self.sca(strings)
-            self.check(ground_truth_repo_id, ground_truth_version_id, sca_repo_id, sca_version_id)
+            sca_results = self.sca(strings)
+
+            # check sca results
+            for sca_repo_id, sca_version_id in sca_results:
+                self.check(ground_truth_repo_id, ground_truth_version_id, sca_repo_id, sca_version_id)
 
         def cal_precision_and_recall(sca_check_result):
             precision = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fp'])
             recall = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fn'])
             return precision, recall
 
-        print(cal_precision_and_recall(self.repo_sca_check_result))
-        print(cal_precision_and_recall(self.version_sca_check_result))
+        precision, recall = cal_precision_and_recall(self.repo_sca_check_result)
+        print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+
+
+        precision, recall = cal_precision_and_recall(self.version_sca_check_result)
+        print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
