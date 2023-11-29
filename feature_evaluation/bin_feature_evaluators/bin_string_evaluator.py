@@ -2,47 +2,43 @@
 # -*- coding: utf-8 -*-
 import os
 from collections import Counter
-from typing import List, Set
+from typing import List
 
-from feature_evaluation.entities import SrcStringFeature, BinStringFeature
+from feature_evaluation.entities import BinStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
-from feature_extraction.entities import RepoFeature, Repository
-from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
-    SrcStringAndFunctionNameExtractor
-from settings import BIN_STRING_SCA_THRESHOLD, BIN_REPOS_JSON, SRC_STRING_SCA_THRESHOLD
+from settings import BIN_STRING_SCA_THRESHOLD
 from utils.elf_utils import extract_elf_strings
-from utils.json_util import load_from_json
 
 
 # @Time : 2023/11/22 15:49
 # @Author : Liu Chengyue
 
 
-class SrcStringEvaluator(FeatureEvaluator):
+class BinStringEvaluator(FeatureEvaluator):
     def __init__(self):
         # bin_string_features
-        super().__init__(SrcStringAndFunctionNameExtractor.__name__)
+        super().__init__(BinStringExtractor.__name__)
 
         # 转换特征
-        self.src_string_feature_dict = dict()
+        self.bin_string_feature_dict = dict()
         for repo_feature in self.repo_features:
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
-            if not self.src_string_feature_dict.get(key):
-                self.src_string_feature_dict[key] = SrcStringFeature(repo_feature)
+            if not self.bin_string_feature_dict.get(key):
+                self.bin_string_feature_dict[key] = BinStringFeature(repo_feature)
             else:
-                self.src_string_feature_dict[key].strings.update(SrcStringFeature(repo_feature).strings)
+                self.bin_string_feature_dict[key].strings.update(BinStringFeature(repo_feature).strings)
 
-        # 特征计数
-        self.src_string_num_dict = {
+        # 计数
+        self.bin_string_num_dict = {
             key: len(strings.strings)
-            for key, strings in self.src_string_feature_dict.items()
+            for key, strings in self.bin_string_feature_dict.items()
         }
 
-        # 特征倒排索引表
+        # string ---> bins
         self.string_repo_dict = dict()
         self.string_repo_version_dict = dict()
-        for repo_feature in self.src_string_feature_dict.values():
+        for repo_feature in self.bin_string_feature_dict.values():
             repo_id = repo_feature.repository.repo_id
             version_id = repo_feature.repository.version_id
             for string in repo_feature.strings:
@@ -54,21 +50,9 @@ class SrcStringEvaluator(FeatureEvaluator):
                     self.string_repo_version_dict[string] = repo_version_id_set = set()
                 repo_version_id_set.add((repo_id, version_id))
 
-        # 扫描结果
-        self.repo_sca_check_result = {
-            "tp": 0,
-            "fp": 0,
-            "fn": 0,
-        }
-        self.version_sca_check_result = {
-            "tp": 0,
-            "fp": 0,
-            "fn": 0,
-        }
-
     def evaluate(self):
         # 分布统计
-        repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
+        repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
         self.statistic(repo_string_nums, "statistic_in_repo_view")
 
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
@@ -97,40 +81,17 @@ class SrcStringEvaluator(FeatureEvaluator):
         filtered_results = []
         for (repo_id, version_id), count in all_results:
             key = f"{repo_id}-{version_id}"
-            string_num = self.src_string_num_dict.get(key)
-            percent = count / string_num
-            if percent > SRC_STRING_SCA_THRESHOLD:
+            string_num = self.bin_string_num_dict.get(key)
+            percent = round(count / string_num, 2)
+            if percent > BIN_STRING_SCA_THRESHOLD:
                 filtered_results.append((repo_id, version_id))
                 # 预览扫描结果
                 print(file_name, percent)
-
-        if not filtered_results:
-            filtered_results = [(None, None)]
         return filtered_results
 
-    def check(self, ground_truth_repo_id,
-              ground_truth_version_id,
-              sca_repo_id,
-              sca_version_id):
-        if not sca_repo_id:
-            self.repo_sca_check_result["fn"] += 1
-            self.version_sca_check_result["fn"] += 1
-        else:
-            if ground_truth_repo_id == sca_repo_id:
-                self.repo_sca_check_result["tp"] += 1
-                if ground_truth_version_id == sca_version_id:
-                    self.version_sca_check_result["tp"] += 1
-                else:
-                    self.version_sca_check_result["fp"] += 1
-            else:
-                self.repo_sca_check_result["fp"] += 1
-                self.version_sca_check_result["fp"] += 1
-
     def sca_evaluate(self):
-        # walk all binaries
-        fe = FeatureEvaluator(BinStringExtractor.__name__)
         # walk all feature
-        for repo_feature in fe.repo_features:
+        for repo_feature in self.repo_features:
             # get ground truth
             ground_truth_repo_id = repo_feature.repository.repo_id
             ground_truth_version_id = repo_feature.repository.repo_id
@@ -140,17 +101,10 @@ class SrcStringEvaluator(FeatureEvaluator):
                 # sca
                 sca_results = self.sca(file_feature.file_path)
 
-                # check sca results
-                for sca_repo_id, sca_version_id in sca_results:
-                    self.check(ground_truth_repo_id, ground_truth_version_id, sca_repo_id, sca_version_id)
+                self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
 
-        def cal_precision_and_recall(sca_check_result):
-            precision = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fp'])
-            recall = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fn'])
-            return precision, recall
-
-        precision, recall = cal_precision_and_recall(self.repo_sca_check_result)
+        precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
         print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
 
-        precision, recall = cal_precision_and_recall(self.version_sca_check_result)
+        precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
         print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")

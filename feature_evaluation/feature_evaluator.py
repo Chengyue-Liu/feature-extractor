@@ -23,6 +23,18 @@ class FeatureEvaluator:
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
 
+        # result
+        self.repo_sca_check_result = {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+        }
+        self.version_sca_check_result = {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+        }
+
     def init_repo_features(self):
         repo_features = []
         for f in os.listdir(self.feature_dir):
@@ -59,6 +71,34 @@ class FeatureEvaluator:
         print("第一四分位数 (Q1):", q1)
         print("第三四分位数 (Q3):", q3)
         print()
+
+    def check(self, ground_truth_repo_id,
+              ground_truth_version_id,
+              sca_results):
+        repo_tp_flag = False
+        version_tp_flag = False
+        for sca_repo_id, sca_version_id in sca_results:
+            if ground_truth_repo_id == sca_repo_id:
+                self.repo_sca_check_result["tp"] += 1
+                repo_tp_flag = True
+                if ground_truth_version_id == sca_version_id:
+                    self.version_sca_check_result["tp"] += 1
+                    version_tp_flag = True
+                else:
+                    self.version_sca_check_result["fp"] += 1
+            else:
+                self.repo_sca_check_result["fp"] += 1
+                self.version_sca_check_result["fp"] += 1
+
+        if not repo_tp_flag:
+            self.repo_sca_check_result["fn"] += 1
+        if not version_tp_flag:
+            self.version_sca_check_result["fn"] += 1
+
+    def cal_precision_and_recall(self, sca_check_result):
+        precision = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fp'])
+        recall = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fn'])
+        return precision, recall
 
     @abstractmethod
     def evaluate(self):
