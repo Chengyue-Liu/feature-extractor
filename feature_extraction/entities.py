@@ -59,40 +59,40 @@ class Repository:
                     library_path = os.path.join(category_path, library_name)
                     for version_number in os.listdir(library_path):
                         version_id += 1
-                        src_path = os.path.join(library_path, version_number, "source")
                         pbar.update(1)
-                        bin_repo = Repository(
-                            repo_path=src_path,
-                            repo_type="source",
-                            repo_id=repo_id,
-                            repo_name=library_name,
-                            version_id=version_id,
-                            repo_version=version_number,
-                        )
-                        src_repos.append(bin_repo)
+                        src_path = os.path.join(library_path, version_number, "source")
+                        if os.path.exists(src_path):
+                            bin_repo = Repository(
+                                repo_path=src_path,
+                                repo_type="source",
+                                repo_id=repo_id,
+                                repo_name=library_name,
+                                version_id=version_id,
+                                repo_version=version_number,
+                            )
+                            src_repos.append(bin_repo)
                         binary_path = os.path.join(library_path, version_number, "binary")
-                        if not os.path.exists(binary_path):
-                            continue
-                        for release_number in os.listdir(binary_path):
-                            release_id += 1
-                            release_path = os.path.join(binary_path, release_number)
-                            for arch_name in os.listdir(release_path):
-                                arch_id += 1
-                                arch_path = os.path.join(release_path, arch_name)
-                                pbar.update(1)
-                                bin_repo = Repository(
-                                    repo_path=arch_path,
-                                    repo_type="binary",
-                                    repo_id=repo_id,
-                                    repo_name=library_name,
-                                    version_id=version_id,
-                                    repo_version=version_number,
-                                    release_id=release_id,
-                                    repo_release=release_number,
-                                    arch_id=arch_id,
-                                    repo_arch=arch_name
-                                )
-                                bin_repos.append(bin_repo)
+                        if os.path.exists(binary_path):
+                            for release_number in os.listdir(binary_path):
+                                release_id += 1
+                                release_path = os.path.join(binary_path, release_number)
+                                for arch_name in os.listdir(release_path):
+                                    arch_id += 1
+                                    arch_path = os.path.join(release_path, arch_name)
+                                    pbar.update(1)
+                                    bin_repo = Repository(
+                                        repo_path=arch_path,
+                                        repo_type="binary",
+                                        repo_id=repo_id,
+                                        repo_name=library_name,
+                                        version_id=version_id,
+                                        repo_version=version_number,
+                                        release_id=release_id,
+                                        repo_release=release_number,
+                                        arch_id=arch_id,
+                                        repo_arch=arch_name
+                                    )
+                                    bin_repos.append(bin_repo)
 
         logger.info(f"saving json ...")
         dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
