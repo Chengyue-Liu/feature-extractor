@@ -71,6 +71,8 @@ class Repository:
                         )
                         src_repos.append(bin_repo)
                         binary_path = os.path.join(library_path, version_number, "binary")
+                        if not os.path.exists(binary_path):
+                            continue
                         for release_number in os.listdir(binary_path):
                             release_id += 1
                             release_path = os.path.join(binary_path, release_number)
