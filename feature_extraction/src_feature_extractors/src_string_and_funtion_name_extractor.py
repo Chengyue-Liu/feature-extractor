@@ -133,5 +133,5 @@ def process_node_name(node_name):
     if "(" in node_name:
         node_name = node_name.split('(')[0]
 
-    node_name = node_name.replace("* ", "")
+    node_name = node_name.strip("*").strip()
     return node_name

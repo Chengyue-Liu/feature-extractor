@@ -44,7 +44,7 @@ def main():
     # 提取特征
     logger.info(f"提取特征")
     # 二进制字符串
-    run_bin_extractor(bin_repos)
+    # run_bin_extractor(bin_repos)
     # 源码字符串
     run_src_extractor(src_repos)
 
