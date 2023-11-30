@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
 import multiprocessing
 import os
 from abc import abstractmethod
 from typing import List
 
+from loguru import logger
 from tqdm import tqdm
 
 from feature_extraction.entities import Repository, RepoFeature, FileFeature
@@ -45,6 +47,12 @@ class BinFeatureExtractor:
         return elf_files
 
     def extract_repo_feature(self, repository):
+        # 保存路径
+        result_path = os.path.join(self.result_dir,
+                                   f"{repository.repo_id}-{repository.version_id}-{repository.release_id}-{repository.arch_id}.json")
+        if os.path.exists(result_path):
+            return
+
         # 找到目标文件
         elf_paths = self.find_elf_files(repository.repo_path)
 
@@ -58,7 +66,6 @@ class BinFeatureExtractor:
         )
 
         # 保存特征
-        result_path = os.path.join(self.result_dir, f"{repository.repo_id}-{repository.version_id}-{repository.release_id}-{repository.arch_id}.json")
         dump_to_json(repo_feature.custom_serialize(), result_path)
 
     def multiple_run(self):
