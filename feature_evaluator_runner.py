@@ -28,12 +28,12 @@ def main():
     # evaluator.evaluate()
 
     # src string
-    # evaluator = SrcStringEvaluator()
-    # evaluator.evaluate()
+    evaluator = SrcStringEvaluator()
+    evaluator.evaluate()
 
     # src function name
-    evaluator = SrcFunctionNameEvaluator()
-    evaluator.evaluate()
+    # evaluator = SrcFunctionNameEvaluator()
+    # evaluator.evaluate()
 
 
 

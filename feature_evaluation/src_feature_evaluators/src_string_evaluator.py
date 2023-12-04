@@ -111,6 +111,8 @@ class SrcStringEvaluator(FeatureEvaluator):
                 # check sca results
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
 
+        print(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
+
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
         print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
 
