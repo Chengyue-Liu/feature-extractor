@@ -57,6 +57,8 @@ class Repository:
                 for library_name in os.listdir(category_path):
                     repo_id += 1
                     library_path = os.path.join(category_path, library_name)
+                    if not os.path.isdir(library_path):
+                        continue
                     for version_number in os.listdir(library_path):
                         version_id += 1
                         pbar.update(1)

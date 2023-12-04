@@ -34,7 +34,7 @@ def run_bin_extractor(repos: List[Repository]):
 def main():
     # 生成json信息
     logger.info(f"生成json信息")
-    # Repository.generate_repositories_json()
+    Repository.generate_repositories_json()
 
     # 从json信息初始化
     logger.info(f"从json信息初始化")
