@@ -39,13 +39,13 @@ def main():
 
     # 从json信息初始化
     logger.info(f"从json信息初始化")
-    # bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
+    bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
     src_repos = Repository.init_repositories_from_json_file(SRC_REPOS_JSON)
 
     # 提取特征
     logger.info(f"提取特征")
     # 二进制字符串
-    # run_bin_extractor(bin_repos)
+    run_bin_extractor(bin_repos)
     # 源码字符串
     run_src_extractor(src_repos)
 

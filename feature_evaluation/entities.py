@@ -71,7 +71,7 @@ class TestCase:
         test_cases = []
         test_case_file_count = 0
         for f_name in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
-            if f_name.endswith('.json'):
+            if f_name.endswith('.json') and f_name[0].isdigit():
                 f_path = os.path.join(feature_dir, f_name)
                 with open(f_path) as f:
                     repo_feature_json = json.load(f)

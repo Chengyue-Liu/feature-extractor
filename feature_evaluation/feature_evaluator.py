@@ -27,6 +27,8 @@ class FeatureEvaluator:
 
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
+        if not os.path.exists(self.merged_feature_path):
+            self.merge_features()
         self.repo_ids = {repo_feature.repository.repo_id for repo_feature in self.repo_features}
         self.repo_version_ids = {f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
                                  for repo_feature in self.repo_features}
@@ -43,6 +45,8 @@ class FeatureEvaluator:
             "fn": 0,
             "tn": 0
         }
+
+        self.evaluate_result = {}
 
     def merge_features(self):
         # todo 把所有的特征合并掉，方便加载
@@ -71,12 +75,14 @@ class FeatureEvaluator:
                 if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
                     f_path = os.path.join(self.feature_dir, f)
                     repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
-            self.merge_features()
         return repo_features
 
     def statistic_data(self, data: List[int], specific_values, data_desc="statistics"):
         if not data_desc:
             data_desc = "statistic_in_repo_view"
+        sample_num = len(data)
+        sum_value = sum(data)
+
         # 计算均值
         mean_value = np.mean(data)
 
@@ -96,6 +102,8 @@ class FeatureEvaluator:
 
         # 输出统计结果
         logger.critical(data_desc)
+        logger.critical(f"样本量: {sample_num}")
+        logger.critical(f"总计[未去重]: {sum_value}")
         logger.critical(f"均值: {mean_value}")
         logger.critical(f"最小值: {min_value}")
         logger.critical(f"最大值: {max_value}")
@@ -107,11 +115,28 @@ class FeatureEvaluator:
         def cal_percent(count):
             return f"{round((count / len(data) * 100), 2)}%"
 
+        special_value_dict = {}
         for specific_value in specific_values:
             # 特定值数量
             specific_value_count = len([d for d in data if d == specific_value])
             logger.critical(
                 f"{specific_value} count: {specific_value_count}, percent: {cal_percent(specific_value_count)}")
+            special_value_dict[specific_value] = {
+                "count": specific_value_count,
+                "percent": cal_percent(specific_value_count)
+            }
+        self.evaluate_result["data_desc"] = {
+            "data_desc": data_desc,
+            "sample_num": sample_num,
+            "sum_value": sum_value,
+            "mean_value": mean_value,
+            "min_value": min_value,
+            "max_value": max_value,
+            "q1": q1,
+            "q3": q3,
+            "q_90": q_90,
+            "specific_values": special_value_dict,
+        }
 
     def check(self, test_case,
               sca_results):
@@ -124,6 +149,7 @@ class FeatureEvaluator:
         for sca_repo_id, sca_version_id in sca_results:
             if ground_truth_repo_id == sca_repo_id:
                 self.repo_sca_check_result["tp"] += 1
+                # print(ground_truth_repo_id)
                 repo_tp_flag = True
                 if ground_truth_version_id == sca_version_id:
                     self.version_sca_check_result["tp"] += 1
@@ -149,9 +175,15 @@ class FeatureEvaluator:
                 self.version_sca_check_result["tn"] += 1
 
     def cal_precision_and_recall(self, sca_check_result):
-        precision = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fp'])
-        recall = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fn'])
-        return precision, recall
+        if (all_num := (sca_check_result['tp'] + sca_check_result['fp'])) != 0:
+            precision = sca_check_result['tp'] / all_num
+        else:
+            precision = 0
+        if (all_num := (sca_check_result['tp'] + sca_check_result['fn'])) != 0:
+            recall = sca_check_result['tp'] / all_num
+        else:
+            recall = 0
+        return round(precision, 2), round(recall, 2)
 
     def sca_evaluate(self, threshold):
         # walk all binaries
