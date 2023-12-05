@@ -8,6 +8,7 @@ from loguru import logger
 
 from feature_evaluation.entities import SrcStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
+from feature_evaluation.test_cases import get_test_cases
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
     SrcStringAndFunctionNameExtractor
@@ -111,25 +112,24 @@ class SrcStringEvaluator(FeatureEvaluator):
     def sca_evaluate(self):
         # walk all binaries
         logger.info(f"init testcases")
-        fe = FeatureEvaluator(BinStringExtractor.__name__)
+        test_cases = get_test_cases()
         logger.info(f"start sca_evaluate")
         # walk all feature
         test_case_file_count = 0
-        for repo_feature in tqdm(fe.repo_features, total=len(fe.repo_features), desc="sca_evaluate"):
+        for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):
             # get ground truth
-            ground_truth_repo_id = repo_feature.repository.repo_id
-            ground_truth_version_id = repo_feature.repository.repo_id
-            test_case_file_count += len(repo_feature.file_features)
+            ground_truth_repo_id = test_case.ground_truth_repo_id
+            ground_truth_version_id = test_case.ground_truth_version_id
+            test_case_file_count += len(test_case.file_paths)
             # sca
-            for file_feature in repo_feature.file_features:
+            for file_path in test_case.file_paths:
                 # sca【设定一个阈值，只要超过阈值的都返回。】
-                sca_results = self.sca(file_feature.file_path)
-
+                sca_results = self.sca(file_path)
                 # check sca results【统计准确率】
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
         logger.info(f"sca_evaluate finished.")
         logger.critical(f"repo_num: {len(self.repo_features)}, string_num: {len(self.string_repo_dict)}")
-        logger.critical(f"testcase repo num:{len(fe.repo_features)}, testcase file num:{test_case_file_count}")
+        logger.critical(f"testcase repo num:{len(test_cases)}, testcase file num:{test_case_file_count}")
 
         logger.critical(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
 
