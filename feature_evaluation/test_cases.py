@@ -27,12 +27,15 @@ def gemerate(json_path):
         )
 
 
-def get_test_cases() -> List[TestCase]:
+def get_test_cases():
     feature_dir = os.path.join(FEATURE_RESULT_DIR, BinStringExtractor.__name__)
     feature_files = os.listdir(feature_dir)
     test_cases = []
+    test_case_file_count = 0
     for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
         if f.endswith('.json'):
             f_path = os.path.join(feature_dir, f)
-            test_cases.append(TestCase.init_from_repo_feature_file_path(f_path))
-    return test_cases
+            tc = TestCase.init_from_repo_feature_file_path(f_path)
+            test_cases.append(tc)
+            test_case_file_count += len(tc.file_paths)
+    return test_cases, test_case_file_count

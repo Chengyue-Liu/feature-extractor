@@ -6,7 +6,7 @@ from collections import Counter
 from tqdm import tqdm
 from loguru import logger
 
-from feature_evaluation.entities import SrcStringFeature
+from feature_evaluation.entities import SrcStringFeature, TestCase
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_evaluation.test_cases import get_test_cases
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
@@ -67,17 +67,17 @@ class SrcStringEvaluator(FeatureEvaluator):
 
     def evaluate(self):
         # sca 效果评估
-        self.sca_evaluate()
+        self.sca_evaluate(SRC_STRING_SCA_THRESHOLD)
 
         # 分布统计
         logger.info(f"generate repo_string_nums")
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
-        self.statistic(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
+        self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
 
         logger.info(f"generate string_seen_repository_num_list")
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
-        self.statistic(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5],
-                       data_desc="statistic_in_string_view")
+        self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5],
+                            data_desc="statistic_in_string_view")
 
     def sca(self, file_path):
         # 文件名称
@@ -105,38 +105,20 @@ class SrcStringEvaluator(FeatureEvaluator):
             if percent > SRC_STRING_SCA_THRESHOLD:
                 filtered_results.append((repo_id, version_id))
                 # 预览扫描结果
-                print(file_name, percent)
+                # print(file_name, percent)
 
         return filtered_results
 
-    def sca_evaluate(self):
-        # walk all binaries
-        logger.info(f"init testcases")
-        test_cases = get_test_cases()
-        logger.info(f"start sca_evaluate")
-        # walk all feature
-        test_case_file_count = 0
-        for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):
-            # get ground truth
-            ground_truth_repo_id = test_case.ground_truth_repo_id
-            ground_truth_version_id = test_case.ground_truth_version_id
-            test_case_file_count += len(test_case.file_paths)
-            # sca
-            for file_path in test_case.file_paths:
-                # sca【设定一个阈值，只要超过阈值的都返回。】
-                sca_results = self.sca(file_path)
-                # check sca results【统计准确率】
-                self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
-        logger.info(f"sca_evaluate finished.")
+    def sca_summary(self, test_case_count, test_case_file_count, threshold):
+        # basic summary
         logger.critical(f"repo_num: {len(self.repo_features)}, string_num: {len(self.string_repo_dict)}")
-        logger.critical(f"testcase repo num:{len(test_cases)}, testcase file num:{test_case_file_count}")
-
-        logger.critical(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
-
+        logger.critical(f"testcase repo num:{test_case_count}, testcase file num:{test_case_file_count}")
+        logger.critical(f"THRESHOLD: {threshold}")
+        # repo
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
         logger.critical(
             f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
-
+        # version
         precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
         logger.critical(
             f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")

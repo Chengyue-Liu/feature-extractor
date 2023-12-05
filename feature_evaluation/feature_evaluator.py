@@ -8,9 +8,11 @@ import numpy as np
 from loguru import logger
 from tqdm import tqdm
 
+from feature_evaluation.entities import TestCase
+from feature_evaluation.test_cases import get_test_cases
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.entities import RepoFeature
-from settings import FEATURE_RESULT_DIR
+from settings import FEATURE_RESULT_DIR, SRC_STRING_SCA_THRESHOLD
 
 
 # @Time : 2023/11/22 15:49
@@ -47,7 +49,7 @@ class FeatureEvaluator:
                 repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
         return repo_features
 
-    def statistic(self, data: List[int], specific_values, data_desc="statistics"):
+    def statistic_data(self, data: List[int], specific_values, data_desc="statistics"):
         if not data_desc:
             data_desc = "statistic_in_repo_view"
         # 计算均值
@@ -86,9 +88,11 @@ class FeatureEvaluator:
             logger.critical(
                 f"{specific_value} count: {specific_value_count}, percent: {cal_percent(specific_value_count)}")
 
-    def check(self, ground_truth_repo_id,
-              ground_truth_version_id,
+    def check(self, test_case,
               sca_results):
+        # get ground truth
+        ground_truth_repo_id = test_case.ground_truth_repo_id
+        ground_truth_version_id = test_case.ground_truth_version_id
         repo_tp_flag = False
         version_tp_flag = False
         for sca_repo_id, sca_version_id in sca_results:
@@ -114,6 +118,27 @@ class FeatureEvaluator:
         recall = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fn'])
         return precision, recall
 
+    def sca_evaluate(self, threshold):
+        # walk all binaries
+        logger.info(f"init testcases")
+        test_cases, test_case_file_count = get_test_cases()
+        logger.info(f"start sca_evaluate")
+        # walk all feature
+        for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):
+            test_case: TestCase
+            for file_path in test_case.file_paths:
+                # sca【设定一个阈值，只要超过阈值的都返回。】
+                sca_results = self.sca(file_path)
+                # check sca results【统计准确率】
+                self.check(test_case, sca_results)
+        logger.info(f"sca_evaluate finished.")
+
+        self.sca_summary(len(test_cases), test_case_file_count, threshold)
+
     @abstractmethod
-    def evaluate(self):
+    def sca(self, file_path):
+        pass
+
+    @abstractmethod
+    def sca_summary(self, test_case_count, test_case_file_count, threshold):
         pass

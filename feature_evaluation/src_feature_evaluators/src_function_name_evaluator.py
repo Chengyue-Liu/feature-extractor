@@ -61,14 +61,15 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
         # 分布统计
         repo_function_name_nums = [len(repo_feature.function_names) for repo_feature in
                                    self.src_function_name_feature_dict.values()]
-        self.statistic(repo_function_name_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
+        self.statistic_data(repo_function_name_nums, specific_values=[0, 1, 2, 3, 4, 5],
+                            data_desc="statistic_in_repo_view")
 
         function_name_seen_repository_num_list = [len(v) for v in self.function_name_repo_dict.values()]
-        self.statistic(function_name_seen_repository_num_list, specific_values=[ 1, 2, 3, 4, 5],
-                       data_desc="statistic_in_string_view")
+        self.statistic_data(function_name_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5],
+                            data_desc="statistic_in_string_view")
 
         # sca 效果评估
-        self.sca_evaluate()
+        self.sca_evaluate(SRC_FUNCTION_NAME_SCA_THRESHOLD)
 
     def sca(self, file_path):
         # 文件名称
@@ -100,29 +101,20 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
             if percent > SRC_FUNCTION_NAME_SCA_THRESHOLD:
                 filtered_results.append((repo_id, version_id))
                 # 预览扫描结果
-                print(file_name, percent)
+                # print(file_name, percent)
 
         return filtered_results
 
-    def sca_evaluate(self):
-        # walk all binaries
-        fe = FeatureEvaluator(BinStringExtractor.__name__)
-        # walk all feature
-        for repo_feature in fe.repo_features:
-            # get ground truth
-            ground_truth_repo_id = repo_feature.repository.repo_id
-            ground_truth_version_id = repo_feature.repository.repo_id
-
-            # sca
-            for file_feature in repo_feature.file_features:
-                # sca
-                sca_results = self.sca(file_feature.file_path)
-
-                # check sca results
-                self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
-
+    def sca_summary(self, test_case_count, test_case_file_count, threshold):
+        # basic summary
+        logger.critical(f"repo_num: {len(self.repo_features)}, string_num: {len(self.function_name_repo_dict)}")
+        logger.critical(f"testcase repo num:{test_case_count}, testcase file num:{test_case_file_count}")
+        logger.critical(f"THRESHOLD: {threshold}")
+        # repo
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
-        print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
-
+        logger.critical(
+            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+        # version
         precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
-        print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+        logger.critical(
+            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
