@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import random
 from typing import Set, List
 
 from tqdm import tqdm
@@ -51,7 +52,10 @@ class TestCase:
 
         :return:
         """
+        sample_size = 100
         test_cases, test_case_file_count = cls.init_from_test_cases_json_file()
+        if len(test_cases) > sample_size:
+            test_cases = random.sample(test_cases, 100)
         return test_cases, test_case_file_count
 
     @classmethod
