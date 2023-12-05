@@ -52,7 +52,10 @@ class TestCase:
 
         :return:
         """
-        test_cases = cls.init_from_test_cases_json_file()
+        if os.path.exists(TEST_CASES_JSON_PATH):
+            test_cases = cls.init_from_test_cases_json_file(TEST_CASES_JSON_PATH)
+        else:
+            test_cases, test_case_file_count = cls.init_test_cases_from_repo_feature_json_file()
         if len(test_cases) > TEST_CASE_SAMPLE_SIZE:
             test_cases = random.sample(test_cases, TEST_CASE_SAMPLE_SIZE)
         return test_cases

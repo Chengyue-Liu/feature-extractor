@@ -173,7 +173,7 @@ class RepoFeature:
         }
 
     @classmethod
-    def init_repo_feature_from_json_file(self, json_path):
+    def init_repo_feature_from_json_file(cls, json_path):
         with open(json_path) as f:
             data = json.load(f)
             repository = Repository.init_repository_from_json_data(data["repository"])
@@ -183,3 +183,16 @@ class RepoFeature:
                 repository=repository,
                 file_features=file_features
             )
+
+    @classmethod
+    def init_repo_features_from_json_data(cls, json_data):
+        repo_features = []
+        for data in json_data:
+            repository = Repository.init_repository_from_json_data(data["repository"])
+            file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json in
+                             data['file_features']]
+            repo_features.append(RepoFeature(
+                repository=repository,
+                file_features=file_features
+            ))
+        return repo_features
