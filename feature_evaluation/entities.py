@@ -45,9 +45,19 @@ class TestCase:
         self.file_paths = file_paths
 
     @classmethod
+    def get_test_cases(cls):
+        """
+        这个方法可以筛选测试用例，加快测试速度等等。
+
+        :return:
+        """
+        test_cases, test_case_file_count = cls.init_from_test_cases_json_file()
+        return test_cases, test_case_file_count
+
+    @classmethod
     def init_test_cases_from_repo_feature_json_file(cls):
         """
-        从库的特征生成测试用柴
+        从库的特征生成测试用例
         :return:
         """
         feature_dir = os.path.join(FEATURE_RESULT_DIR, BinStringExtractor.__name__)
@@ -76,6 +86,7 @@ class TestCase:
         """
         从测试用例文件生成测试用例
         """
+        test_case_file_count = 0
         with open(f_path) as f:
             data = json.load(f)
             test_cases = []
@@ -89,6 +100,8 @@ class TestCase:
                     file_paths=file_paths
                 )
                 test_cases.append(tc)
+                test_case_file_count += len(tc.file_paths)
+        return test_cases, test_case_file_count
 
     @classmethod
     def update_test_cases_json(cls, json_path=TEST_CASES_JSON_PATH):

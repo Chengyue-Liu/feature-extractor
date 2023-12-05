@@ -24,7 +24,9 @@ class FeatureEvaluator:
 
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
-
+        self.repo_ids = {repo_feature.repository.repo_id for repo_feature in self.repo_features}
+        self.repo_version_ids = {f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
+                                 for repo_feature in self.repo_features}
         # result
         self.repo_sca_check_result = {
             "tp": 0,
@@ -91,6 +93,7 @@ class FeatureEvaluator:
         # get ground truth
         ground_truth_repo_id = test_case.ground_truth_repo_id
         ground_truth_version_id = test_case.ground_truth_version_id
+
         repo_tp_flag = False
         version_tp_flag = False
         for sca_repo_id, sca_version_id in sca_results:
@@ -106,9 +109,12 @@ class FeatureEvaluator:
                 self.repo_sca_check_result["fp"] += 1
                 self.version_sca_check_result["fp"] += 1
 
-        if not repo_tp_flag:
+        # 存在但是没有找到
+        if not repo_tp_flag and ground_truth_repo_id in self.repo_ids:
             self.repo_sca_check_result["fn"] += 1
-        if not version_tp_flag:
+
+        key = f"{ground_truth_repo_id}-{ground_truth_version_id}"
+        if not version_tp_flag and key in self.repo_version_ids:
             self.version_sca_check_result["fn"] += 1
 
     def cal_precision_and_recall(self, sca_check_result):
@@ -119,7 +125,7 @@ class FeatureEvaluator:
     def sca_evaluate(self, threshold):
         # walk all binaries
         logger.info(f"init testcases")
-        test_cases, test_case_file_count = TestCase.init_test_cases_from_repo_feature_json_file()
+        test_cases, test_case_file_count = TestCase.get_test_cases()
         logger.info(f"start sca_evaluate")
         # walk all feature
         for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):
