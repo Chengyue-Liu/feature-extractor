@@ -61,10 +61,11 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
         # 分布统计
         repo_function_name_nums = [len(repo_feature.function_names) for repo_feature in
                                    self.src_function_name_feature_dict.values()]
-        self.statistic(repo_function_name_nums, "statistic_in_repo_view")
+        self.statistic(repo_function_name_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
 
         function_name_seen_repository_num_list = [len(v) for v in self.function_name_repo_dict.values()]
-        self.statistic(function_name_seen_repository_num_list, "statistic_in_string_view")
+        self.statistic(function_name_seen_repository_num_list, specific_values=[ 1, 2, 3, 4, 5],
+                       data_desc="statistic_in_string_view")
 
         # sca 效果评估
         self.sca_evaluate()

@@ -53,13 +53,15 @@ class BinStringEvaluator(FeatureEvaluator):
                     self.string_repo_version_dict[string] = repo_version_id_set = set()
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited")
+
     def evaluate(self):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
-        self.statistic(repo_string_nums, "statistic_in_repo_view")
+        self.statistic(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
 
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
-        self.statistic(string_seen_repository_num_list, "statistic_in_string_view")
+        self.statistic(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5],
+                       data_desc="statistic_in_string_view")
 
         # sca 效果评估
         self.sca_evaluate()
