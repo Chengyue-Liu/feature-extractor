@@ -53,10 +53,10 @@ class TestCase:
         :return:
         """
         sample_size = 100
-        test_cases, test_case_file_count = cls.init_from_test_cases_json_file()
+        test_cases = cls.init_from_test_cases_json_file()
         if len(test_cases) > sample_size:
             test_cases = random.sample(test_cases, 100)
-        return test_cases, test_case_file_count
+        return test_cases
 
     @classmethod
     def init_test_cases_from_repo_feature_json_file(cls):
@@ -90,7 +90,6 @@ class TestCase:
         """
         从测试用例文件生成测试用例
         """
-        test_case_file_count = 0
         with open(f_path) as f:
             data = json.load(f)
             test_cases = []
@@ -104,8 +103,7 @@ class TestCase:
                     file_paths=file_paths
                 )
                 test_cases.append(tc)
-                test_case_file_count += len(tc.file_paths)
-        return test_cases, test_case_file_count
+        return test_cases
 
     @classmethod
     def update_test_cases_json(cls, json_path=TEST_CASES_JSON_PATH):

@@ -125,11 +125,13 @@ class FeatureEvaluator:
     def sca_evaluate(self, threshold):
         # walk all binaries
         logger.info(f"init testcases")
-        test_cases, test_case_file_count = TestCase.get_test_cases()
+        test_cases = TestCase.get_test_cases()
+        test_case_file_count = 0
         logger.info(f"start sca_evaluate")
         # walk all feature
         for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):
             test_case: TestCase
+            test_case_file_count += len(test_case.file_paths)
             for file_path in test_case.file_paths:
                 # sca【设定一个阈值，只要超过阈值的都返回。】
                 sca_results = self.sca(file_path)
