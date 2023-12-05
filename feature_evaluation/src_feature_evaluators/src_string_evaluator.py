@@ -28,7 +28,7 @@ class SrcStringEvaluator(FeatureEvaluator):
         # 转换特征
         logger.info(f"convert feature")
         self.src_string_feature_dict = dict()
-        for repo_feature in self.repo_features:
+        for repo_feature in tqdm(self.repo_features, total=len(self.repo_features), desc="convert feature"):
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
             if not self.src_string_feature_dict.get(key):
                 self.src_string_feature_dict[key] = SrcStringFeature(repo_feature)
@@ -46,7 +46,9 @@ class SrcStringEvaluator(FeatureEvaluator):
         logger.info(f"特征倒排索引表")
         self.string_repo_dict = dict()
         self.string_repo_version_dict = dict()
-        for repo_feature in self.src_string_feature_dict.values():
+        for repo_feature in tqdm(self.src_string_feature_dict.values(),
+                                 total=len(self.src_string_feature_dict),
+                                 desc="特征倒排索引表"):
             repo_id = repo_feature.repository.repo_id
             version_id = repo_feature.repository.version_id
             for string in repo_feature.strings:

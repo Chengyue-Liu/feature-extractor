@@ -35,6 +35,7 @@ def main():
     # evaluator = SrcFunctionNameEvaluator()
     # evaluator.evaluate()
 
+    # ps aux | grep "python feature_evaluator_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
 
 
 if __name__ == '__main__':
