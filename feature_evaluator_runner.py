@@ -25,14 +25,17 @@ def main():
     # 生成任务
     # bin string
     evaluator = BinStringEvaluator()
+    evaluator.merge_features()
     evaluator.evaluate()
 
     # src string
     evaluator = SrcStringEvaluator()
+    evaluator.merge_features()
     evaluator.evaluate()
 
     # src function name
     evaluator = SrcFunctionNameEvaluator()
+    evaluator.merge_features()
     evaluator.evaluate()
 
     # 常用命令
@@ -46,9 +49,7 @@ if __name__ == '__main__':
 
 # todo
 """
-1. 建立特征库
-2. 特征库统计分析
-3. 建立用例库
-4. 用例库扫描效果分析
+1. 把字符串，和函数名合并，搞明白，然后今晚跑一遍1000个测试用例的。
+2. 明天周三，和字哥沟通一下现在的情况。
 
 """

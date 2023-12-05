@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
 import os
 from abc import abstractmethod
 from typing import List
@@ -20,6 +21,7 @@ from settings import FEATURE_RESULT_DIR
 class FeatureEvaluator:
     def __init__(self, extractor_name):
         # feature json dir
+        self.extractor_name =extractor_name
         self.feature_dir = os.path.join(FEATURE_RESULT_DIR, extractor_name)
 
         # repo features
@@ -41,14 +43,31 @@ class FeatureEvaluator:
             "tn": 0
         }
 
+    def merge_features(self):
+        # todo 把所有的特征合并掉，方便加载
+        merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
+        logger.info(f"dump to {merged_feature_path}")
+        data = [repo_feature.custom_serialize() for repo_feature in self.repo_features]
+        with open(merged_feature_path, 'w') as f:
+            json.dump(data, f, ensure_ascii=False)
+
+
     def init_repo_features(self):
+        # todo 这里如果有合并的特征，那就直接从合并的特征中加载
         logger.info(f"init_repo_features...")
-        repo_features = []
-        feature_files = os.listdir(self.feature_dir)
-        for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
-            if f.endswith('.json'):
-                f_path = os.path.join(self.feature_dir, f)
-                repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+        merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
+        if os.path.exists(merged_feature_path):
+            logger.info(f"init from {merged_feature_path}")
+            with open(merged_feature_path) as f:
+                data = json.load(f)
+                repo_features = RepoFeature.init_repo_features_from_json_data(data)
+        else:
+            repo_features = []
+            feature_files = os.listdir(self.feature_dir)
+            for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
+                if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
+                    f_path = os.path.join(self.feature_dir, f)
+                    repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
         return repo_features
 
     def statistic_data(self, data: List[int], specific_values, data_desc="statistics"):
