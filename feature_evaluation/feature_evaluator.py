@@ -69,14 +69,13 @@ class FeatureEvaluator:
         q3 = np.percentile(data, 75)
 
         # 输出统计结果
-        print(data_desc)
-        print("均值:", mean_value)
-        print("最小值:", min_value)
-        print("最大值:", max_value)
-        print("中位数:", median_value)
-        print("第一四分位数 (Q1):", q1)
-        print("第三四分位数 (Q3):", q3)
-        print()
+        logger.critical(data_desc)
+        logger.critical("均值:", mean_value)
+        logger.critical("最小值:", min_value)
+        logger.critical("最大值:", max_value)
+        logger.critical("中位数:", median_value)
+        logger.critical("第一四分位数 (Q1):", q1)
+        logger.critical("第三四分位数 (Q3):", q3)
 
     def check(self, ground_truth_repo_id,
               ground_truth_version_id,

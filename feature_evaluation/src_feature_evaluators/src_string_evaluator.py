@@ -63,9 +63,11 @@ class SrcStringEvaluator(FeatureEvaluator):
 
     def evaluate(self):
         # 分布统计
+        logger.info(f"generate repo_string_nums")
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
         self.statistic(repo_string_nums, "statistic_in_repo_view")
 
+        logger.info(f"generate string_seen_repository_num_list")
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
         self.statistic(string_seen_repository_num_list, "statistic_in_string_view")
 
@@ -119,10 +121,10 @@ class SrcStringEvaluator(FeatureEvaluator):
                 # check sca results【统计准确率】
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
 
-        print(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
+        logger.critical(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
 
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
-        print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+        logger.critical(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
 
         precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
-        print(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+        logger.critical(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
