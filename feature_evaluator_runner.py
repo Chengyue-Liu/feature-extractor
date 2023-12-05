@@ -35,6 +35,8 @@ def main():
     # evaluator = SrcFunctionNameEvaluator()
     # evaluator.evaluate()
 
+    # 常用命令
+    # nohup python feature_evaluator_runner.py &
     # ps aux | grep "python feature_evaluator_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
 
 

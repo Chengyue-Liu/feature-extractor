@@ -62,7 +62,14 @@ class SrcStringEvaluator(FeatureEvaluator):
         logger.info(f"{self.__class__.__name__} inited...")
 
     def evaluate(self):
+        # sca 效果评估
+        self.sca_evaluate()
+
         # 分布统计
+        repo_num = len(self.repo_features)
+        string_num = len(self.string_repo_dict)
+        logger.critical(f"repo_num: {repo_num}, string_num: {string_num}")
+
         logger.info(f"generate repo_string_nums")
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
         self.statistic(repo_string_nums, "statistic_in_repo_view")
@@ -71,8 +78,7 @@ class SrcStringEvaluator(FeatureEvaluator):
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
         self.statistic(string_seen_repository_num_list, "statistic_in_string_view")
 
-        # sca 效果评估
-        self.sca_evaluate()
+
 
     def sca(self, file_path):
         # 文件名称
@@ -110,11 +116,12 @@ class SrcStringEvaluator(FeatureEvaluator):
         fe = FeatureEvaluator(BinStringExtractor.__name__)
         logger.info(f"start sca_evaluate")
         # walk all feature
+        test_case_file_count = 0
         for repo_feature in tqdm(fe.repo_features, total=len(fe.repo_features), desc="sca_evaluate"):
             # get ground truth
             ground_truth_repo_id = repo_feature.repository.repo_id
             ground_truth_version_id = repo_feature.repository.repo_id
-
+            test_case_file_count += len(repo_feature.file_features)
             # sca
             for file_feature in repo_feature.file_features:
                 # sca【设定一个阈值，只要超过阈值的都返回。】
@@ -123,10 +130,15 @@ class SrcStringEvaluator(FeatureEvaluator):
                 # check sca results【统计准确率】
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
         logger.info(f"sca_evaluate finished.")
+        logger.critical(f"testcase repo num:{len(fe.repo_features)}")
+        logger.critical(f"testcase file num:{test_case_file_count}")
+
         logger.critical(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
 
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
-        logger.critical(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+        logger.critical(
+            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
 
         precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
-        logger.critical(f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+        logger.critical(
+            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
