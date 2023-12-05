@@ -70,12 +70,12 @@ class FeatureEvaluator:
 
         # 输出统计结果
         logger.critical(data_desc)
-        logger.critical("均值:", mean_value)
-        logger.critical("最小值:", min_value)
-        logger.critical("最大值:", max_value)
-        logger.critical("中位数:", median_value)
-        logger.critical("第一四分位数 (Q1):", q1)
-        logger.critical("第三四分位数 (Q3):", q3)
+        logger.critical(f"均值: {mean_value}" )
+        logger.critical(f"最小值: {min_value}")
+        logger.critical(f"最大值: {max_value}")
+        logger.critical(f"中位数: {median_value}")
+        logger.critical(f"第一四分位数 (Q1): {q1}")
+        logger.critical(f"第三四分位数 (Q3): {q3}")
 
     def check(self, ground_truth_repo_id,
               ground_truth_version_id,
