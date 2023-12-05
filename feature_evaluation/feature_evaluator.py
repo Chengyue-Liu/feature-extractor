@@ -32,11 +32,13 @@ class FeatureEvaluator:
             "tp": 0,
             "fp": 0,
             "fn": 0,
+            "tn": 0
         }
         self.version_sca_check_result = {
             "tp": 0,
             "fp": 0,
             "fn": 0,
+            "tn": 0
         }
 
     def init_repo_features(self):
@@ -110,12 +112,18 @@ class FeatureEvaluator:
                 self.version_sca_check_result["fp"] += 1
 
         # 存在但是没有找到
-        if not repo_tp_flag and ground_truth_repo_id in self.repo_ids:
-            self.repo_sca_check_result["fn"] += 1
+        if not repo_tp_flag:
+            if ground_truth_repo_id in self.repo_ids:
+                self.repo_sca_check_result["fn"] += 1
+            else:
+                self.repo_sca_check_result["tn"] += 1
 
-        key = f"{ground_truth_repo_id}-{ground_truth_version_id}"
-        if not version_tp_flag and key in self.repo_version_ids:
-            self.version_sca_check_result["fn"] += 1
+        # 版本级别
+        if not version_tp_flag:
+            if f"{ground_truth_repo_id}-{ground_truth_version_id}" in self.repo_version_ids:
+                self.version_sca_check_result["fn"] += 1
+            else:
+                self.version_sca_check_result["tn"] += 1
 
     def cal_precision_and_recall(self, sca_check_result):
         precision = sca_check_result['tp'] / (sca_check_result['tp'] + sca_check_result['fp'])

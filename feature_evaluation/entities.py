@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.entities import RepoFeature, Repository
-from settings import FEATURE_RESULT_DIR, TEST_CASES_JSON_PATH
+from settings import FEATURE_RESULT_DIR, TEST_CASES_JSON_PATH, TEST_CASE_SAMPLE_SIZE
 
 
 # @Time : 2023/11/29 15:53
@@ -52,10 +52,9 @@ class TestCase:
 
         :return:
         """
-        sample_size = 100
         test_cases = cls.init_from_test_cases_json_file()
-        if len(test_cases) > sample_size:
-            test_cases = random.sample(test_cases, 100)
+        if len(test_cases) > TEST_CASE_SAMPLE_SIZE:
+            test_cases = random.sample(test_cases, TEST_CASE_SAMPLE_SIZE)
         return test_cases
 
     @classmethod
