@@ -23,6 +23,7 @@ class FeatureEvaluator:
         # feature json dir
         self.extractor_name = extractor_name
         self.feature_dir = os.path.join(FEATURE_RESULT_DIR, extractor_name)
+        self.merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
 
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
@@ -45,19 +46,21 @@ class FeatureEvaluator:
 
     def merge_features(self):
         # todo 把所有的特征合并掉，方便加载
-        merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
-        logger.info(f"dump to {merged_feature_path}")
+        logger.info(f"dump merged feature to {self.merged_feature_path}")
         data = [repo_feature.custom_serialize() for repo_feature in self.repo_features]
-        with open(merged_feature_path, 'w') as f:
+        with open(self.merged_feature_path, 'w') as f:
             json.dump(data, f, ensure_ascii=False)
 
     def init_repo_features(self):
+        """
+        从文件初始化特征
+        :return:
+        """
         # 如果有合并的，就直接用合并的
         logger.info(f"init_repo_features...")
-        merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
-        if os.path.exists(merged_feature_path):
-            logger.info(f"init from {merged_feature_path}")
-            with open(merged_feature_path) as f:
+        if os.path.exists(self.merged_feature_path):
+            logger.info(f"init from {self.merged_feature_path}")
+            with open(self.merged_feature_path) as f:
                 data = json.load(f)
                 repo_features = RepoFeature.init_repo_features_from_json_data(data)
         # 如果没有合并的，那么就先合并
