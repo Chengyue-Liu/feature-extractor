@@ -130,8 +130,7 @@ class SrcStringEvaluator(FeatureEvaluator):
                 # check sca results【统计准确率】
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
         logger.info(f"sca_evaluate finished.")
-        logger.critical(f"testcase repo num:{len(fe.repo_features)}")
-        logger.critical(f"testcase file num:{test_case_file_count}")
+        logger.critical(f"testcase repo num:{len(fe.repo_features)}, testcase file num:{test_case_file_count}")
 
         logger.critical(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
 
