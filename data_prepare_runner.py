@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from data_preparation.decompress_debian_package import multiple_decompress
-from data_preparation.file_path_manager import get_tar_file_paths
+from data_preparation.decompressor import multiple_decompress
+from data_preparation.tar_file_manager import get_tar_file_paths
 from utils.json_util import dump_to_json
 
 # @Time : 2023/11/21 16:54
