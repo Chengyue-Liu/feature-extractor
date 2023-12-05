@@ -3,6 +3,7 @@
 import os
 from collections import Counter
 
+from tqdm import tqdm
 from loguru import logger
 
 from feature_evaluation.entities import SrcStringFeature
@@ -25,6 +26,7 @@ class SrcStringEvaluator(FeatureEvaluator):
         super().__init__(SrcStringAndFunctionNameExtractor.__name__)
 
         # 转换特征
+        logger.info(f"convert feature")
         self.src_string_feature_dict = dict()
         for repo_feature in self.repo_features:
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
@@ -34,12 +36,14 @@ class SrcStringEvaluator(FeatureEvaluator):
                 self.src_string_feature_dict[key].strings.update(SrcStringFeature(repo_feature).strings)
 
         # 特征计数
+        logger.info(f"count feature")
         self.src_string_num_dict = {
             key: len(src_string_feature.strings)
             for key, src_string_feature in self.src_string_feature_dict.items()
         }
 
         # 特征倒排索引表
+        logger.info(f"特征倒排索引表")
         self.string_repo_dict = dict()
         self.string_repo_version_dict = dict()
         for repo_feature in self.src_string_feature_dict.values():
@@ -54,6 +58,7 @@ class SrcStringEvaluator(FeatureEvaluator):
                     self.string_repo_version_dict[string] = repo_version_id_set = set()
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited...")
+
     def evaluate(self):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
@@ -87,6 +92,7 @@ class SrcStringEvaluator(FeatureEvaluator):
             key = f"{repo_id}-{version_id}"
             string_num = self.src_string_num_dict.get(key)
             percent = round(count / string_num, 2)
+            # 确认匹配结果
             if percent > SRC_STRING_SCA_THRESHOLD:
                 filtered_results.append((repo_id, version_id))
                 # 预览扫描结果
@@ -98,17 +104,17 @@ class SrcStringEvaluator(FeatureEvaluator):
         # walk all binaries
         fe = FeatureEvaluator(BinStringExtractor.__name__)
         # walk all feature
-        for repo_feature in fe.repo_features:
+        for repo_feature in tqdm(fe.repo_features, total=len(fe.repo_features), desc="sca_evaluate"):
             # get ground truth
             ground_truth_repo_id = repo_feature.repository.repo_id
             ground_truth_version_id = repo_feature.repository.repo_id
 
             # sca
             for file_feature in repo_feature.file_features:
-                # sca
+                # sca【设定一个阈值，只要超过阈值的都返回。】
                 sca_results = self.sca(file_feature.file_path)
 
-                # check sca results
+                # check sca results【统计准确率】
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
 
         print(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")

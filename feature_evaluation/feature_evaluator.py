@@ -5,6 +5,7 @@ from abc import abstractmethod
 from typing import List
 
 import numpy as np
+from loguru import logger
 
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.entities import RepoFeature
@@ -36,11 +37,16 @@ class FeatureEvaluator:
         }
 
     def init_repo_features(self):
+        logger.info(f"init_repo_features...")
         repo_features = []
+        count = 0
         for f in os.listdir(self.feature_dir):
             if f.endswith('.json'):
+                count += 1
                 f_path = os.path.join(self.feature_dir, f)
                 repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+                if count % 1000 == 0:
+                    logger.info(f"init_repo_features: {count}")
         return repo_features
 
     def statistic(self, data, data_desc):
