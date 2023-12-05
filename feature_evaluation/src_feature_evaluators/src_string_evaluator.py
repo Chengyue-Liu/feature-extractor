@@ -106,7 +106,9 @@ class SrcStringEvaluator(FeatureEvaluator):
 
     def sca_evaluate(self):
         # walk all binaries
+        logger.info(f"init testcases")
         fe = FeatureEvaluator(BinStringExtractor.__name__)
+        logger.info(f"start sca_evaluate")
         # walk all feature
         for repo_feature in tqdm(fe.repo_features, total=len(fe.repo_features), desc="sca_evaluate"):
             # get ground truth
@@ -120,7 +122,7 @@ class SrcStringEvaluator(FeatureEvaluator):
 
                 # check sca results【统计准确率】
                 self.check(ground_truth_repo_id, ground_truth_version_id, sca_results)
-
+        logger.info(f"sca_evaluate finished.")
         logger.critical(f"SRC_STRING_SCA_THRESHOLD: {SRC_STRING_SCA_THRESHOLD}")
 
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
