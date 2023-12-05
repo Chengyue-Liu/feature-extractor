@@ -21,7 +21,7 @@ from settings import FEATURE_RESULT_DIR
 class FeatureEvaluator:
     def __init__(self, extractor_name):
         # feature json dir
-        self.extractor_name =extractor_name
+        self.extractor_name = extractor_name
         self.feature_dir = os.path.join(FEATURE_RESULT_DIR, extractor_name)
 
         # repo features
@@ -51,9 +51,8 @@ class FeatureEvaluator:
         with open(merged_feature_path, 'w') as f:
             json.dump(data, f, ensure_ascii=False)
 
-
     def init_repo_features(self):
-        # todo 这里如果有合并的特征，那就直接从合并的特征中加载
+        # 如果有合并的，就直接用合并的
         logger.info(f"init_repo_features...")
         merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
         if os.path.exists(merged_feature_path):
@@ -61,6 +60,7 @@ class FeatureEvaluator:
             with open(merged_feature_path) as f:
                 data = json.load(f)
                 repo_features = RepoFeature.init_repo_features_from_json_data(data)
+        # 如果没有合并的，那么就先合并
         else:
             repo_features = []
             feature_files = os.listdir(self.feature_dir)
@@ -68,6 +68,7 @@ class FeatureEvaluator:
                 if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
                     f_path = os.path.join(self.feature_dir, f)
                     repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+            self.merge_features()
         return repo_features
 
     def statistic_data(self, data: List[int], specific_values, data_desc="statistics"):

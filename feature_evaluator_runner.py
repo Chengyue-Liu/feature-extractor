@@ -25,17 +25,14 @@ def main():
     # 生成任务
     # bin string
     evaluator = BinStringEvaluator()
-    evaluator.merge_features()
     evaluator.evaluate()
 
     # src string
     evaluator = SrcStringEvaluator()
-    evaluator.merge_features()
     evaluator.evaluate()
 
     # src function name
     evaluator = SrcFunctionNameEvaluator()
-    evaluator.merge_features()
     evaluator.evaluate()
 
     # 常用命令
