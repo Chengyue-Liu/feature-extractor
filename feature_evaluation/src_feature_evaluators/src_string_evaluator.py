@@ -28,9 +28,6 @@ class SrcStringEvaluator(FeatureEvaluator):
         logger.info(f"convert feature")
         self.src_string_feature_dict = dict()
         for repo_feature in tqdm(self.repo_features, total=len(self.repo_features), desc="convert feature"):
-            # 处理特征
-            if not repo_feature.file_features:
-                continue
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
             if not self.src_string_feature_dict.get(key):
                 self.src_string_feature_dict[key] = SrcStringFeature(repo_feature)
