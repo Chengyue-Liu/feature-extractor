@@ -24,16 +24,16 @@ from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
 def main():
     # 生成任务
     # bin string
-    evaluator = BinStringEvaluator()
-    evaluator.evaluate()
+    # evaluator = BinStringEvaluator()
+    # evaluator.evaluate()
 
     # src string
     evaluator = SrcStringEvaluator()
     evaluator.evaluate()
 
     # src function name
-    evaluator = SrcFunctionNameEvaluator()
-    evaluator.evaluate()
+    # evaluator = SrcFunctionNameEvaluator()
+    # evaluator.evaluate()
 
     # 常用命令
     # nohup python feature_evaluator_runner.py &
