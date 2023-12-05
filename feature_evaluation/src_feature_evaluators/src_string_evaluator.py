@@ -3,13 +3,11 @@
 import os
 from collections import Counter
 
-from tqdm import tqdm
 from loguru import logger
+from tqdm import tqdm
 
-from feature_evaluation.entities import SrcStringFeature, TestCase
+from feature_evaluation.entities import SrcStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
-from feature_evaluation.test_cases import get_test_cases
-from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
     SrcStringAndFunctionNameExtractor
 from settings import SRC_STRING_SCA_THRESHOLD

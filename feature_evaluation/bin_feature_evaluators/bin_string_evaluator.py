@@ -2,14 +2,11 @@
 # -*- coding: utf-8 -*-
 import os
 from collections import Counter
-from typing import List
 
 from loguru import logger
-from tqdm import tqdm
 
-from feature_evaluation.entities import BinStringFeature, TestCase
+from feature_evaluation.entities import BinStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
-from feature_evaluation.test_cases import get_test_cases
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from settings import BIN_STRING_SCA_THRESHOLD
 from utils.elf_utils import extract_elf_strings

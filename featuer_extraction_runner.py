@@ -13,7 +13,8 @@ from feature_extraction.bin_feature_extractors.bin_string_extractor import BinSt
 
 from feature_extraction.decrators import timing_decorator, log_decorator
 from feature_extraction.entities import Repository
-from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import SrcStringAndFunctionNameExtractor
+from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
+    SrcStringAndFunctionNameExtractor
 from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
 
 
@@ -33,7 +34,7 @@ def run_bin_extractor(repos: List[Repository]):
 
 def main():
     # 生成json信息
-    logger.info(f"生成json信息")
+    logger.info(f"生成要提取的库的json信息")
     Repository.generate_repositories_json()
 
     # 从json信息初始化

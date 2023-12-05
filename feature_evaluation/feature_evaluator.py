@@ -9,10 +9,8 @@ from loguru import logger
 from tqdm import tqdm
 
 from feature_evaluation.entities import TestCase
-from feature_evaluation.test_cases import get_test_cases
-from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.entities import RepoFeature
-from settings import FEATURE_RESULT_DIR, SRC_STRING_SCA_THRESHOLD
+from settings import FEATURE_RESULT_DIR
 
 
 # @Time : 2023/11/22 15:49
@@ -121,7 +119,7 @@ class FeatureEvaluator:
     def sca_evaluate(self, threshold):
         # walk all binaries
         logger.info(f"init testcases")
-        test_cases, test_case_file_count = get_test_cases()
+        test_cases, test_case_file_count = TestCase.init_test_cases_from_repo_feature_json_file()
         logger.info(f"start sca_evaluate")
         # walk all feature
         for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):

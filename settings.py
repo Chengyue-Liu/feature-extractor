@@ -26,6 +26,9 @@ BIN_REPOS_JSON = env.str("BIN_REPOS_JSON", "resources/repository_json/bin_repos.
 FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
 
 # feature evaluation
+
+TEST_CASES_JSON_PATH = env.str("TEST_CASES_JSON_PATH", "resources/repository_json/test_cases.json")
+
 # bin string sca threshold
 BIN_STRING_SCA_THRESHOLD = 0.6
 SRC_STRING_SCA_THRESHOLD = 0.1
