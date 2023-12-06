@@ -195,8 +195,14 @@ class RepoFeature:
             def log_progress(chunk_count):
                 logger.info(f"init_repo_features_from_json_data progress: {chunk_count}")
 
-            with multiprocessing.Pool(PROCESS_NUM) as pool:
-                for result in pool.map(process, ijson.items(file, 'item')):
+            with multiprocessing.Pool() as pool:
+                # 使用 imap_unordered 并行处理每个 item
+                results = pool.imap_unordered(process, ijson.items(file, 'item'))
+
+                # 主进程可以在这里执行其他任务
+
+                # 等待所有任务完成
+                for result in results:
                     count += 1
                     if count % 1000 == 0:
                         log_progress(count)
