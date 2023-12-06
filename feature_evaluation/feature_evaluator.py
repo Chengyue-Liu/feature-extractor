@@ -27,11 +27,20 @@ class FeatureEvaluator:
 
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
+
+        # 如果没有保存过，保存起来
         if not os.path.exists(self.merged_feature_path):
             self.merge_features()
-        self.repo_ids = {repo_feature.repository.repo_id for repo_feature in self.repo_features}
-        self.repo_version_ids = {f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
-                                 for repo_feature in self.repo_features}
+
+        # 初始化id集合
+        logger.info(f"init ids")
+        self.repo_ids = set()
+        self.repo_version_ids = set()
+        for repo_feature in self.repo_features:
+            self.repo_ids.add(repo_feature.repository.repo_id)
+            self.repo_version_ids.add(f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}")
+
+        logger.info(f"init ids finished")
         # result
         self.repo_sca_check_result = {
             "tp": 0,
@@ -54,7 +63,7 @@ class FeatureEvaluator:
         data = [repo_feature.custom_serialize() for repo_feature in self.repo_features]
         with open(self.merged_feature_path, 'w') as f:
             json.dump(data, f, ensure_ascii=False)
-
+        logger.info(f"dump finished.")
     def init_repo_features(self):
         """
         从文件初始化特征
@@ -75,6 +84,7 @@ class FeatureEvaluator:
                 if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
                     f_path = os.path.join(self.feature_dir, f)
                     repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+        logger.info(f"init_repo_features finished.")
         return repo_features
 
     def statistic_data(self, data: List[int], specific_values, data_desc="statistics"):

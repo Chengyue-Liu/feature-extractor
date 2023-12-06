@@ -23,6 +23,7 @@ class BinStringEvaluator(FeatureEvaluator):
         super().__init__(BinStringExtractor.__name__)
 
         # 转换特征
+        logger.info("convert feature")
         self.bin_string_feature_dict = dict()
         for repo_feature in self.repo_features:
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
@@ -32,12 +33,14 @@ class BinStringEvaluator(FeatureEvaluator):
                 self.bin_string_feature_dict[key].strings.update(BinStringFeature(repo_feature).strings)
 
         # 计数
+        logger.info("count feature")
         self.bin_string_num_dict = {
             key: len(strings.strings)
             for key, strings in self.bin_string_feature_dict.items()
         }
 
         # string ---> bins
+        logger.info("倒排索引表")
         self.string_repo_dict = dict()
         self.string_repo_version_dict = dict()
         for repo_feature in self.bin_string_feature_dict.values():
