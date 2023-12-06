@@ -82,8 +82,7 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
 
         # 提取二进制字符串
         strings = extract_elf_strings(file_path)
-        with open(f"{os.path.split(file_path)[-1]}.json", 'w') as f:
-            json.dump(strings, f)
+
         # 根据字符串查询对应的library_id, version_id
         string_repo_id_version_id_tuple_list = []
         count = 0
