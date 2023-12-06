@@ -7,4 +7,7 @@ from feature_evaluation.entities import TestCase
 
 
 if __name__ == '__main__':
+    """
+    生成测试用例信息【不要所有的，从二进制里面跳一部分出来】
+    """
     TestCase.update_test_cases_json()
