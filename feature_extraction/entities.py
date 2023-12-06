@@ -199,8 +199,6 @@ class RepoFeature:
                 # 使用 imap_unordered 并行处理每个 item
                 results = pool.imap_unordered(process, ijson.items(file, 'item'))
 
-                # 主进程可以在这里执行其他任务
-
                 # 等待所有任务完成
                 for result in results:
                     count += 1
