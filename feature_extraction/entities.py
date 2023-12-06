@@ -29,24 +29,30 @@ class Repository:
                  release_id=None, arch_id=None, repo_release=None, repo_arch=None,
                  target_src_file_num=0,
                  elf_paths=None):
+        # basic
         self.repo_path = repo_path
         self.repo_type = repo_type
 
+        # repo
         self.repo_id = repo_id
         self.repo_name = repo_name
 
+        # version
         self.version_id = version_id
         self.repo_version = repo_version
 
+        # package, release
         self.package_name = package_name
         self.release_id = release_id
         self.repo_release = repo_release
 
+        # arch
         self.arch_id = arch_id
         self.repo_arch = repo_arch
 
-        self.target_src_file_num=target_src_file_num
-        self.elf_paths = elf_paths
+        # file
+        self.target_src_file_num = target_src_file_num  # 源码目标文件的数量
+        self.elf_paths = elf_paths  # elf文件路径
 
     @classmethod
     def init_repository_from_json_data(cls, json_task):
