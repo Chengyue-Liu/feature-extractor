@@ -11,7 +11,7 @@ env = Env()
 env.read_env()
 
 # share
-PROCESS_NUM = env.int("EXTRACTION_PROCESS_NUM", multiprocessing.cpu_count()-1)
+PROCESS_NUM = env.int("EXTRACTION_PROCESS_NUM", multiprocessing.cpu_count() - 1)
 
 # data preparation
 DEBIAN_TAR_FILE_DIR_PATH = env.str("DEBIAN_TAR_FILE_DIR_PATH")
@@ -30,7 +30,9 @@ FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
 
 TEST_CASES_JSON_PATH = env.str("TEST_CASES_JSON_PATH", "resources/repository_json/test_cases.json")
 TEST_CASE_SAMPLE_SIZE = env.int("TEST_CASE_SAMPLE_SIZE", 1000)
-TEST_CASE_SAMPLE_SIZE_PER_REPO = env.int("TEST_CASE_SAMPLE_SIZE_PER_REPO", 3)
+TEST_CASE_SAMPLE_SIZE_PER_REPO = env.int("TEST_CASE_SAMPLE_SIZE_PER_REPO", 3)  # 不可以小于三
+if TEST_CASE_SAMPLE_SIZE_PER_REPO < 3:
+    TEST_CASE_SAMPLE_SIZE_PER_REPO = 3
 
 # bin string sca threshold
 BIN_STRING_SCA_THRESHOLD = 0.6

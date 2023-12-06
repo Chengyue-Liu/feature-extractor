@@ -33,6 +33,7 @@ def generate_tc_information():
     with open(TEST_CASES_JSON_PATH, 'w') as f:
         json.dump(test_case_info, f, ensure_ascii=False)
 
+    # 额外保存一份 bin_repos 格式的
     tc_bin_repos = []
     for bin_repos in bin_repo_test_cases_dict.values():
         tc_bin_repos.extend(bin_repos)
@@ -45,7 +46,17 @@ def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
     bin_file_test_case_num = 0
     for repo_id, repos in bin_repo_test_cases_dict.items():
         if len(test_cases := bin_repo_test_cases_dict[repo_id]) > TEST_CASE_SAMPLE_SIZE_PER_REPO:
-            test_cases = random.sample(repos, TEST_CASE_SAMPLE_SIZE_PER_REPO)
+            # 按照版本倒序排列
+            test_cases.sort(key=lambda x: x["repo_release"], reverse=True)
+            test_cases.sort(key=lambda x: x["repo_version"], reverse=True)
+
+            # 取最新，最旧
+            test_cases.append(repos[1])
+            test_cases.append(repos[-1])
+
+            # 然后从中间随机补充
+            test_cases = random.sample(repos[1:-1], TEST_CASE_SAMPLE_SIZE_PER_REPO - 2)
+
         bin_repo_test_case_num += len(test_cases)
         for test_case in test_cases:
             bin_file_test_case_num += len(test_case["elf_paths"])
