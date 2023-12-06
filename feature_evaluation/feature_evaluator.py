@@ -75,7 +75,7 @@ class FeatureEvaluator:
         if os.path.exists(self.merged_feature_path):
             logger.info(f"init from {self.merged_feature_path}")
             with open(self.merged_feature_path) as f:
-                logger.info(f"load file into memory, file size: {os.path.getsize(self.merged_feature_path)/1024**3}")
+                logger.info(f"loading... file into memory, file size: {os.path.getsize(self.merged_feature_path)/1024**3}")
                 data = json.load(f)
                 logger.info(f"load file finished.")
                 repo_features = RepoFeature.init_repo_features_from_json_data(data)
