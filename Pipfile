@@ -13,7 +13,7 @@ dataclasses-json = "*"
 #bitarray = "==1.1.0"
 #pybloom3 = "*"
 # postgres
-sqlalchemy = "2.0.0b2"
+sqlalchemy = "==2.0.0b2"
 psycopg2-binary = "*"
 # redis
 redis = "*"
@@ -39,4 +39,4 @@ ijson = "*"
 [dev-packages]
 
 [requires]
-python_version = "3.11"
+python_version = "3."
