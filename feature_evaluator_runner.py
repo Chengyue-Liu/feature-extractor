@@ -40,13 +40,13 @@ def main():
     # ps aux | grep "python feature_evaluator_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
 
 
+
 if __name__ == '__main__':
     main()
 
 
 # todo
 """
-1. 把字符串，和函数名合并，搞明白，然后今晚跑一遍1000个测试用例的。
-2. 明天周三，和字哥沟通一下现在的情况。
+1. 后续其他的特征，一定要存到postgres中。存在文件中，每次读取太慢了。
 
 """
