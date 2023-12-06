@@ -7,18 +7,16 @@
 # @File : entities.py
 # @Software: PyCharm
 import dataclasses
-import enum
 import json
 import multiprocessing
 import os
-from dataclasses import dataclass
 from typing import List
 
 import ijson
 from loguru import logger
 from tqdm import tqdm
 
-from settings import DECOMPRESSED_DEBIAN_FILE_DIR_PATH, SRC_REPOS_JSON, BIN_REPOS_JSON, PROCESS_NUM
+from settings import DECOMPRESSED_DEBIAN_FILE_DIR_PATH, SRC_REPOS_JSON, BIN_REPOS_JSON
 from utils.json_util import dump_to_json, load_from_json
 
 
@@ -189,41 +187,41 @@ class RepoFeature:
     @classmethod
     def init_repo_features_from_json_data(cls, path):
         # 下面是单进程逻辑
-        # with open(path, 'rb') as file:
-            # repo_features = []
-            # count = 0
-            # for item in ijson.items(file, 'item'):
-            #     count += 1
-            #     if count % 1000 == 0:
-            #         logger.info(f"init_repo_features_from_json_data progress: {count}")
-            #     repository = Repository.init_repository_from_json_data(item["repository"])
-            #     file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
-            #                      for file_feature_json in item['file_features']]
-            #     repo_features.append(RepoFeature(
-            #         repository=repository,
-            #         file_features=file_features
-            #     ))
-            # return repo_features
-
-        # 下面的逻辑是多进程读取，但是也没感觉快多少。
         with open(path, 'rb') as file:
             repo_features = []
             count = 0
-
-            def log_progress(chunk_count):
-                logger.info(f"init_repo_features_from_json_data progress: {chunk_count}")
-
-            with multiprocessing.Pool() as pool:
-                # 使用 imap_unordered 并行处理每个 item
-                results = pool.imap_unordered(process, ijson.items(file, 'item'))
-
-                # 等待所有任务完成
-                for result in results:
-                    count += 1
-                    if count % 1000 == 0:
-                        log_progress(count)
-                    repo_features.append(result)
+            for item in ijson.items(file, 'item'):
+                count += 1
+                if count % 1000 == 0:
+                    logger.info(f"init_repo_features_from_json_data progress: {count}")
+                repository = Repository.init_repository_from_json_data(item["repository"])
+                file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
+                                 for file_feature_json in item['file_features']]
+                repo_features.append(RepoFeature(
+                    repository=repository,
+                    file_features=file_features
+                ))
             return repo_features
+
+        # 下面的逻辑是多进程读取，但是也没感觉快多少。
+        # with open(path, 'rb') as file:
+        #     repo_features = []
+        #     count = 0
+        #
+        #     def log_progress(chunk_count):
+        #         logger.info(f"init_repo_features_from_json_data progress: {chunk_count}")
+        #
+        #     with multiprocessing.Pool() as pool:
+        #         # 使用 imap_unordered 并行处理每个 item
+        #         results = pool.imap_unordered(process, ijson.items(file, 'item'))
+        #
+        #         # 等待所有任务完成
+        #         for result in results:
+        #             count += 1
+        #             if count % 1000 == 0:
+        #                 log_progress(count)
+        #             repo_features.append(result)
+        #     return repo_features
 
 
 def process(item):
