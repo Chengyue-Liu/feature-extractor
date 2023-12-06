@@ -1,16 +1,17 @@
-import json
+import ijson
+from tqdm import tqdm
 
-from feature_extraction.entities import Repository
-from settings import SRC_REPOS_JSON, BIN_REPOS_JSON
+from feature_extraction.entities import Repository, FileFeature, RepoFeature
 
-src_repos = Repository.init_repositories_from_json_file(SRC_REPOS_JSON)
-bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
-
-src_repo_ids = {repo.repo_id for repo in src_repos}
-src_version_ids = {f"{repo.repo_id}-{repo.version_id}" for repo in src_repos}
-
-bin_repo_ids = {repo.repo_id for repo in bin_repos}
-bin_version_ids = {f"{repo.repo_id}-{repo.version_id}" for repo in bin_repos}
-
-print("repo_ids.difference", len(src_repo_ids.difference(bin_repo_ids)))
-print("version_ids.difference", len(src_version_ids.difference(bin_version_ids)))
+path = "/Users/liuchengyue/Desktop/works/feature_analysis/feature-extractor/features/BinStringExtractor/BinStringEvaluator.json"
+with open(path, 'rb') as file:
+    repo_features = []
+    for item in ijson.items(file, 'item'):
+        repository = Repository.init_repository_from_json_data(item["repository"])
+        file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json in
+                         item['file_features']]
+        repo_features.append(RepoFeature(
+            repository=repository,
+            file_features=file_features
+        ))
+        print(repository.repo_id)

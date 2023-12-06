@@ -9,43 +9,34 @@ loguru = "*" # log
 environs = "*" # env
 tqdm = "*"
 dataclasses-json = "*"
-
 # bloom filter
 #bitarray = "==1.1.0"
 #pybloom3 = "*"
-
 # postgres
 sqlalchemy = "2.0.0b2"
 psycopg2-binary = "*"
-
 # redis
 redis = "*"
-
 # extraction
 #clang = "==14.0"
 tree-sitter = "*"
-
 # git
 gitpython = "*"
-
 # crawler
 urllib3 = "==1.26.6"
 requests = "*"
 beautifulsoup4 = "*"
-
 # draw
 matplotlib = "*"
 seaborn = "*"
-
 # fuzz
 fuzzywuzzy = "*"
 rapidfuzz = "*"
-
 # binary ninja
 networkx = "*"
+ijson = "*"
 
 [dev-packages]
-
 
 [requires]
 python_version = "3.11"

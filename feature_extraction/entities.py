@@ -13,6 +13,7 @@ import os
 from dataclasses import dataclass
 from typing import List
 
+import ijson
 from loguru import logger
 from tqdm import tqdm
 
@@ -185,14 +186,15 @@ class RepoFeature:
             )
 
     @classmethod
-    def init_repo_features_from_json_data(cls, json_data):
-        repo_features = []
-        for data in tqdm(json_data, total=len(json_data), desc="init_repo_features_from_json_data"):
-            repository = Repository.init_repository_from_json_data(data["repository"])
-            file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json in
-                             data['file_features']]
-            repo_features.append(RepoFeature(
-                repository=repository,
-                file_features=file_features
-            ))
-        return repo_features
+    def init_repo_features_from_json_data(cls, path):
+        with open(path, 'rb') as file:
+            repo_features = []
+            for item in ijson.items(file, 'item'):
+                repository = Repository.init_repository_from_json_data(item["repository"])
+                file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
+                                 for file_feature_json in item['file_features']]
+                repo_features.append(RepoFeature(
+                    repository=repository,
+                    file_features=file_features
+                ))
+            return repo_features
