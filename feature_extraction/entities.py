@@ -25,7 +25,9 @@ class Repository:
     def __init__(self,
                  repo_path, repo_type,
                  repo_id, version_id, repo_name, repo_version,
-                 release_id=None, arch_id=None, repo_release=None, repo_arch=None):
+                 package_name=None,
+                 release_id=None, arch_id=None, repo_release=None, repo_arch=None,
+                 elf_paths=None):
         self.repo_path = repo_path
         self.repo_type = repo_type
 
@@ -35,71 +37,14 @@ class Repository:
         self.version_id = version_id
         self.repo_version = repo_version
 
+        self.package_name = package_name
         self.release_id = release_id
         self.repo_release = repo_release
 
         self.arch_id = arch_id
         self.repo_arch = repo_arch
 
-    @classmethod
-    def generate_repositories_json(cls):
-        src_repos = []
-        bin_repos = []
-        repo_id = 0
-        version_id = 0
-        release_id = 0
-        arch_id = 0
-        with tqdm(total=1200000, desc="generate_repositories_json") as pbar:
-            for category_name in os.listdir(DECOMPRESSED_DEBIAN_FILE_DIR_PATH):
-                category_path = os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category_name)
-                if not os.path.isdir(category_path):
-                    continue
-                for library_name in os.listdir(category_path):
-                    repo_id += 1
-                    library_path = os.path.join(category_path, library_name)
-                    if not os.path.isdir(library_path):
-                        continue
-                    for version_number in os.listdir(library_path):
-                        version_id += 1
-                        pbar.update(1)
-                        src_path = os.path.join(library_path, version_number, "source")
-                        if os.path.exists(src_path):
-                            bin_repo = Repository(
-                                repo_path=src_path,
-                                repo_type="source",
-                                repo_id=repo_id,
-                                repo_name=library_name,
-                                version_id=version_id,
-                                repo_version=version_number,
-                            )
-                            src_repos.append(bin_repo)
-                        binary_path = os.path.join(library_path, version_number, "binary")
-                        if os.path.exists(binary_path):
-                            for release_number in os.listdir(binary_path):
-                                release_id += 1
-                                release_path = os.path.join(binary_path, release_number)
-                                for arch_name in os.listdir(release_path):
-                                    arch_id += 1
-                                    arch_path = os.path.join(release_path, arch_name)
-                                    pbar.update(1)
-                                    bin_repo = Repository(
-                                        repo_path=arch_path,
-                                        repo_type="binary",
-                                        repo_id=repo_id,
-                                        repo_name=library_name,
-                                        version_id=version_id,
-                                        repo_version=version_number,
-                                        release_id=release_id,
-                                        repo_release=release_number,
-                                        arch_id=arch_id,
-                                        repo_arch=arch_name
-                                    )
-                                    bin_repos.append(bin_repo)
-
-        logger.info(f"saving json ...")
-        dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
-        dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
-        logger.info(f"all finished.")
+        self.elf_paths = elf_paths
 
     @classmethod
     def init_repository_from_json_data(cls, json_task):
@@ -135,8 +80,11 @@ class Repository:
             "arch_id": self.arch_id,
             "repo_name": self.repo_name,
             "repo_version": self.repo_version,
+            "package_name": self.package_name,
             "repo_release": self.repo_release,
             "repo_arch": self.repo_arch,
+            "elf_paths": self.elf_paths
+
         }
 
 

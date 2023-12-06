@@ -9,6 +9,13 @@ from feature_extraction.entities import FileFeature
 # @Time : 2023/11/29 16:05
 # @Author : Liu Chengyue
 
+def is_elf_file(file_path):
+    try:
+        with open(file_path, 'rb') as f:
+            # ELF 文件的前四个字节为 b'\x7fELF'
+            return f.read(4) == b'\x7fELF'
+    except IOError:
+        return False
 
 def extract_elf_strings(path: str) -> List[str]:
     cmd = f"strings {path}"
