@@ -22,6 +22,7 @@ LANGUAGE_SO_FILE_PATH = env.str("LANGUAGE_SO_FILE_PATH", "resources/build/my-lan
 
 SRC_REPOS_JSON = env.str("SRC_REPOS_JSON", "resources/repository_json/src_repos.json")
 BIN_REPOS_JSON = env.str("BIN_REPOS_JSON", "resources/repository_json/bin_repos.json")
+TC_BIN_REPOS_JSON = env.str("TC_BIN_REPOS_JSON", "resources/repository_json/tc_bin_repos.json")
 
 FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
 

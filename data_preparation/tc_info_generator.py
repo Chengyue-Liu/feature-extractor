@@ -6,7 +6,8 @@ import random
 
 from loguru import logger
 
-from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, TEST_CASES_JSON_PATH, TEST_CASE_SAMPLE_SIZE_PER_REPO
+from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, TEST_CASES_JSON_PATH, TEST_CASE_SAMPLE_SIZE_PER_REPO, \
+    TC_BIN_REPOS_JSON
 
 
 # @Time : 2023/12/6 18:46
@@ -31,6 +32,12 @@ def generate_tc_information():
     }
     with open(TEST_CASES_JSON_PATH, 'w') as f:
         json.dump(test_case_info, f, ensure_ascii=False)
+
+    tc_bin_repos = []
+    for bin_repos in bin_repo_test_cases_dict.values():
+        tc_bin_repos.extend(bin_repos)
+    with open(TC_BIN_REPOS_JSON, 'w') as f:
+        json.dump(tc_bin_repos, f, ensure_ascii=False)
 
 
 def filter_test_cases(bin_repo_test_cases_dict, tc_summary):

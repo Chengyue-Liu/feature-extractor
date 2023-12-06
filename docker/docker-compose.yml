@@ -1,0 +1,14 @@
+version: '3'
+services:
+  feature-analysis: # 用来存储特征
+    image: mongo:4.4  # 使用最新版的MongoDB镜像
+    container_name: feature-analysis  # 指定容器名称
+    platform: linux/arm64/v8
+    restart: always
+    ports:
+      - "27019:27017"  # 映射MongoDB的默认端口
+    volumes:
+      - ./mongo-data:/data/db  # 将MongoDB的数据存储到本地的data目录下，确保该目录存在并具有适当的权限
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb  # 设置MongoDB的管理员用户名
+      MONGO_INITDB_ROOT_PASSWORD: mongodb  # 设置MongoDB的管理员密码
