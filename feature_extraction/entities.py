@@ -55,27 +55,27 @@ class Repository:
         self.elf_paths = elf_paths  # elf文件路径
 
     @classmethod
-    def init_repository_from_json_data(cls, repo_json):
+    def init_repository_from_json_data(cls, json_data):
         repository = Repository(
-            repo_path=repo_json["repo_path"],
-            repo_type=repo_json["repo_type"],
-            repo_id=repo_json["repo_id"],
-            repo_name=repo_json["repo_name"],
-            repo_version=repo_json["repo_version"],
-            package_name=repo_json["package_name"],
-            version_id=repo_json["version_id"],
-            repo_release=repo_json["repo_release"],
-            release_id=repo_json["release_id"],
-            repo_arch=repo_json["repo_arch"],
-            arch_id=repo_json["arch_id"],
-            target_src_file_num=repo_json["target_src_file_num"],
-            elf_paths=repo_json["elf_paths"],
+            repo_path=json_data["repo_path"],
+            repo_type=json_data["repo_type"],
+            repo_id=json_data["repo_id"],
+            repo_name=json_data["repo_name"],
+            repo_version=json_data["repo_version"],
+            package_name=json_data["package_name"],
+            version_id=json_data["version_id"],
+            repo_release=json_data["repo_release"],
+            release_id=json_data["release_id"],
+            repo_arch=json_data["repo_arch"],
+            arch_id=json_data["arch_id"],
+            target_src_file_num=json_data["target_src_file_num"],
+            elf_paths=json_data["elf_paths"],
         )
         return repository
 
     @classmethod
-    def init_repositories_from_json_file(cls, json_path):
-        json_repositories = load_from_json(json_path)
+    def init_repositories_from_json_file(cls, file_path):
+        json_repositories = load_from_json(file_path)
         repositories = []
         for json_repository in json_repositories:
             repositories.append(cls.init_repository_from_json_data(json_repository))
@@ -113,7 +113,7 @@ class FileFeature:
         }
 
     @classmethod
-    def init_file_feature_from_json_data(self, json_data):
+    def init_file_feature_from_json_data(cls, json_data):
         return FileFeature(
             file_path=json_data['file_path'],
             feature=json_data['feature']
@@ -133,8 +133,8 @@ class RepoFeature:
         }
 
     @classmethod
-    def init_repo_feature_from_json_file(cls, json_path):
-        with open(json_path) as f:
+    def init_repo_feature_from_json_file(cls, file_path):
+        with open(file_path) as f:
             data = json.load(f)
             repository = Repository.init_repository_from_json_data(data["repository"])
             file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json in
@@ -143,52 +143,3 @@ class RepoFeature:
                 repository=repository,
                 file_features=file_features
             )
-
-    @classmethod
-    def init_repo_features_from_json_data(cls, path):
-        # 下面是单进程逻辑
-        with open(path, 'rb') as file:
-            repo_features = []
-            count = 0
-            for item in ijson.items(file, 'item'):
-                count += 1
-                if count % 1000 == 0:
-                    logger.info(f"init_repo_features_from_json_data progress: {count}")
-                repository = Repository.init_repository_from_json_data(item["repository"])
-                file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
-                                 for file_feature_json in item['file_features']]
-                repo_features.append(RepoFeature(
-                    repository=repository,
-                    file_features=file_features
-                ))
-            return repo_features
-
-        # 下面的逻辑是多进程读取，但是也没感觉快多少。
-        # with open(path, 'rb') as file:
-        #     repo_features = []
-        #     count = 0
-        #
-        #     def log_progress(chunk_count):
-        #         logger.info(f"init_repo_features_from_json_data progress: {chunk_count}")
-        #
-        #     with multiprocessing.Pool() as pool:
-        #         # 使用 imap_unordered 并行处理每个 item
-        #         results = pool.imap_unordered(process, ijson.items(file, 'item'))
-        #
-        #         # 等待所有任务完成
-        #         for result in results:
-        #             count += 1
-        #             if count % 1000 == 0:
-        #                 log_progress(count)
-        #             repo_features.append(result)
-        #     return repo_features
-
-
-def process(item):
-    repository = Repository.init_repository_from_json_data(item["repository"])
-    file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
-                     for file_feature_json in item['file_features']]
-    return RepoFeature(
-        repository=repository,
-        file_features=file_features
-    )

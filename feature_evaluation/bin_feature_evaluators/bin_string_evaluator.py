@@ -108,4 +108,4 @@ class BinStringEvaluator(FeatureEvaluator):
         # version
         precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
         logger.critical(
-            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
+            f"repo level sca result: {self.version_sca_check_result}, precision: {precision}, recall: {recall}")

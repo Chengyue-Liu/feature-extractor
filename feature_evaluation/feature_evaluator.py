@@ -28,9 +28,6 @@ class FeatureEvaluator:
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
 
-        # 如果没有保存过，保存起来
-        if not os.path.exists(self.merged_feature_path):
-            self.merge_features()
 
         # 初始化id集合
         logger.info(f"init ids")
@@ -72,17 +69,12 @@ class FeatureEvaluator:
         """
         # 如果有合并的，就直接用合并的
         logger.info(f"init_repo_features...")
-        if os.path.exists(self.merged_feature_path):
-            logger.info(f"init from {self.merged_feature_path}")
-            repo_features = RepoFeature.init_repo_features_from_json_data(self.merged_feature_path)
-        # 如果没有合并的，那么就先合并
-        else:
-            repo_features = []
-            feature_files = os.listdir(self.feature_dir)
-            for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
-                if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
-                    f_path = os.path.join(self.feature_dir, f)
-                    repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+        repo_features = []
+        feature_files = os.listdir(self.feature_dir)
+        for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
+            if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
+                f_path = os.path.join(self.feature_dir, f)
+                repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
         logger.info(f"init_repo_features finished.")
         return repo_features
 

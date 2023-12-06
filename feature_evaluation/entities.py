@@ -93,18 +93,19 @@ class TestCase:
         从测试用例文件生成测试用例
         """
         with open(f_path) as f:
-            data = json.load(f)
+            data = json.load(f)["bin_repo_test_cases_dict"]
             test_cases = []
-            for tc_json in data:
-                repo_id = tc_json["ground_truth_repo_id"]
-                version_id = tc_json["ground_truth_version_id"]
-                file_paths = tc_json["file_paths"]
-                tc = TestCase(
-                    ground_truth_repo_id=repo_id,
-                    ground_truth_version_id=version_id,
-                    file_paths=file_paths
-                )
-                test_cases.append(tc)
+            for repo_id, repo_jsons in data.items():
+                for repo_json in repo_jsons:
+                    repo_id = repo_json["repo_id"]
+                    version_id = repo_json["version_id"]
+                    file_paths = repo_json["elf_paths"]
+                    tc = TestCase(
+                        ground_truth_repo_id=repo_id,
+                        ground_truth_version_id=version_id,
+                        file_paths=file_paths
+                    )
+                    test_cases.append(tc)
         return test_cases
 
     @classmethod

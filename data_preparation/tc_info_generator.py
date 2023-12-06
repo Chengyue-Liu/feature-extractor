@@ -14,21 +14,26 @@ from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, TEST_CASES_JSON_PATH, TEST_
 
 
 def generate_tc_information():
+    tc_summary = {}
     # 加载源码信息
-    src_repo_ids = load_src_repo_info()
+    src_repo_ids = load_src_repo_info(tc_summary)
 
     # 加载二进制信息
-    bin_repo_test_cases_dict = load_bin_repo_info(src_repo_ids)
+    bin_repo_test_cases_dict = load_bin_repo_info(src_repo_ids, tc_summary)
 
     # 筛选
-    filter_test_cases(bin_repo_test_cases_dict)
+    filter_test_cases(bin_repo_test_cases_dict, tc_summary)
 
     # 保存
+    test_case_info = {
+        "tc_summary": tc_summary,
+        "bin_repo_test_cases_dict": bin_repo_test_cases_dict,
+    }
     with open(TEST_CASES_JSON_PATH, 'w') as f:
-        json.dump(bin_repo_test_cases_dict, f, ensure_ascii=False)
+        json.dump(test_case_info, f, ensure_ascii=False)
 
 
-def filter_test_cases(bin_repo_test_cases_dict):
+def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
     bin_repo_test_case_num = 0
     bin_file_test_case_num = 0
     for repo_id, repos in bin_repo_test_cases_dict.items():
@@ -43,8 +48,13 @@ def filter_test_cases(bin_repo_test_cases_dict):
         f"tc repo version num: {bin_repo_test_case_num}\n"
         f"tc file num: {bin_file_test_case_num}\n")
 
+    tc_summary["TEST_CASE_SAMPLE_SIZE_PER_REPO"] = TEST_CASE_SAMPLE_SIZE_PER_REPO
+    tc_summary["tc_repo_num"] = len(bin_repo_test_cases_dict)
+    tc_summary["tc_repo_version_num"] = bin_repo_test_case_num
+    tc_summary["tc_file_num"] = bin_file_test_case_num
 
-def load_bin_repo_info(src_repo_ids):
+
+def load_bin_repo_info(src_repo_ids, tc_summary):
     bin_repo_num = 0
     bin_with_src_repo_num = 0
     bin_repo_test_cases_dict = collections.defaultdict(list)  # repo_id: repos
@@ -62,10 +72,13 @@ def load_bin_repo_info(src_repo_ids):
     logger.info(f"all bin package num: {all_bin_repo_num}\n"
                 f"bin package with elf repo num: {bin_repo_num}\n"
                 f"bin package with elf with src repo num: {bin_with_src_repo_num}\n")
+    tc_summary["all_bin_package_num"] = all_bin_repo_num
+    tc_summary["bin_package_with_elf_repo_num"] = bin_repo_num
+    tc_summary["bin_package_with_elf_with_src_repo_num"] = bin_with_src_repo_num
     return bin_repo_test_cases_dict
 
 
-def load_src_repo_info():
+def load_src_repo_info(tc_summary):
     src_repo_ids = set()
     src_repo_version_ids = set()
     with open(SRC_REPOS_JSON) as f:
@@ -83,4 +96,7 @@ def load_src_repo_info():
     logger.info(f"all_src_repo_num: {all_src_repo_num}\n"
                 f"src repo with target file num: {len(src_repo_ids)}\n"
                 f"src repo version with target file num: {len(src_repo_version_ids)}\n")
+    tc_summary["all_src_repo_num"] = all_src_repo_num
+    tc_summary["src_repo_with_target_file_num"] = len(src_repo_ids)
+    tc_summary["src_repo_version_with_target_file_num"] = len(src_repo_version_ids)
     return src_repo_ids
