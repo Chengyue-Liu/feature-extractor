@@ -16,33 +16,32 @@ from settings import DEBIAN_TAR_FILE_DIR_PATH, DECOMPRESSED_DEBIAN_FILE_DIR_PATH
 # @Time : 2023/11/21 16:45
 # @Author : Liu Chengyue
 
-def get_category(lib_name):
-    if lib_name.startswith("lib"):
-        category = lib_name[:4]
-    else:
-        category = lib_name[:1]
-    return category
-
 
 def get_decompress_target_path(path):
     # 获取名称
-    file_name = os.path.split(path)[-1]
+    repo_dir, file_name = os.path.split(path)
+    repo_category_dir, repo_name = os.path.split(repo_dir)
+    _, repo_category_name = os.path.split(repo_category_dir)
     if ".orig" in file_name:
         file_name = file_name.split(".orig")[0]
-        lib_name, lib_version = file_name.split("_")
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, get_category(lib_name), lib_name, lib_version, "source")
+        pacakge_name, repo_version = file_name.split("_")
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, repo_category_name, repo_name, repo_version,
+                            "source")
     elif file_name.endswith(".tar.gz") or file_name.endswith(".tar.xz"):
-        lib_name, lib_version = file_name.split("_")
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, get_category(lib_name), lib_name, lib_version, "source")
+        pacakge_name, repo_version = file_name.split("_")
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, repo_category_name, repo_name, repo_version,
+                            "source")
     elif file_name.endswith(".deb") or file_name.endswith(".udeb"):
         file_name, extension = os.path.splitext(file_name)
-        lib_name, lib_version_release, lib_arch = file_name.split("_")
+        pacakge_name, lib_version_release, package_arch = file_name.split("_")
         if "-" in lib_version_release:
-            lib_version, lib_release = lib_version_release.split("-", 1)
+            repo_version, package_release = lib_version_release.split("-", 1)
         else:
-            lib_version, lib_release = lib_version_release, "0"
-        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, get_category(lib_name), lib_name, lib_version, "binary",
-                            lib_release, lib_release)
+            repo_version, package_release = lib_version_release, "0"
+        return os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, repo_category_name, repo_name, repo_version,
+                            "binary",
+                            pacakge_name,
+                            package_release, package_arch)
     else:
         print(path)
         raise
@@ -56,7 +55,7 @@ def find_data_tar_gz(dir_path):
                 return f_path
 
 
-def unar(archive_path, target_dir):
+def unar_decompress(archive_path, target_dir):
     try:
         command = f"unar {archive_path} -o {target_dir}  -q"
         subprocess.run(command, shell=True, check=True)
@@ -83,17 +82,17 @@ def decompress(archive_path):
             os.makedirs(tmp_dir)
 
             # 解压 deb 到 临时文件夹
-            unar(archive_path, tmp_dir)
+            unar_decompress(archive_path, tmp_dir)
 
             # 解压 data.tar.gz 到 目标文件夹
             data_file_path = find_data_tar_gz(tmp_dir)
-            unar(data_file_path, target_dir)
+            unar_decompress(data_file_path, target_dir)
 
             # 删除临时文件夹
             shutil.rmtree(tmp_dir)
         # 源码
         else:
-            unar(archive_path, target_dir)
+            unar_decompress(archive_path, target_dir)
     except Exception as e:
         logger.error(f"error occurred when decompress {archive_path}, error: {e}")
         logger.error(traceback.format_exc())
