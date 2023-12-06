@@ -11,7 +11,7 @@ env = Env()
 env.read_env()
 
 # share
-PROCESS_NUM = env.int("EXTRACTION_PROCESS_NUM", multiprocessing.cpu_count())
+PROCESS_NUM = env.int("EXTRACTION_PROCESS_NUM", multiprocessing.cpu_count()-1)
 
 # data preparation
 DEBIAN_TAR_FILE_DIR_PATH = env.str("DEBIAN_TAR_FILE_DIR_PATH")
