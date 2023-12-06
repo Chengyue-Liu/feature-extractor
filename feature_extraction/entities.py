@@ -187,7 +187,7 @@ class RepoFeature:
     @classmethod
     def init_repo_features_from_json_data(cls, json_data):
         repo_features = []
-        for data in json_data:
+        for data in tqdm(json_data, total=len(json_data), desc="init_repo_features_from_json_data"):
             repository = Repository.init_repository_from_json_data(data["repository"])
             file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json in
                              data['file_features']]

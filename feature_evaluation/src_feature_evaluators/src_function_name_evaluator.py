@@ -5,6 +5,7 @@ import os
 from collections import Counter
 
 from loguru import logger
+from tqdm import tqdm
 
 from feature_evaluation.entities import SrcStringFeature, SrcFunctionNameFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
@@ -26,8 +27,9 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
         super().__init__(SrcStringAndFunctionNameExtractor.__name__)
 
         # 转换特征
+        logger.info("convert feature")
         self.src_function_name_feature_dict = dict()
-        for repo_feature in self.repo_features:
+        for repo_feature in tqdm(self.repo_features, total=len(self.repo_features), desc="convert feature"):
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
             if not self.src_function_name_feature_dict.get(key):
                 self.src_function_name_feature_dict[key] = SrcFunctionNameFeature(repo_feature)
@@ -36,15 +38,18 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
                     SrcFunctionNameFeature(repo_feature).function_names)
 
         # 特征计数
+        logger.info("count feature")
         self.src_function_name_num_dict = {
             key: len(src_function_name_feature.function_names)
             for key, src_function_name_feature in self.src_function_name_feature_dict.items()
         }
 
         # 特征倒排索引表
+        logger.info("倒排索引表")
         self.function_name_repo_dict = dict()
         self.function_name_repo_version_dict = dict()
-        for repo_feature in self.src_function_name_feature_dict.values():
+        for repo_feature in tqdm(self.src_function_name_feature_dict.values(),
+                                 total=len(self.src_function_name_feature_dict), desc="倒排索引表"):
             repo_id = repo_feature.repository.repo_id
             version_id = repo_feature.repository.version_id
             for function_name in repo_feature.function_names:

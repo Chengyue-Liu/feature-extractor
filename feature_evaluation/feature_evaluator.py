@@ -36,7 +36,7 @@ class FeatureEvaluator:
         logger.info(f"init ids")
         self.repo_ids = set()
         self.repo_version_ids = set()
-        for repo_feature in self.repo_features:
+        for repo_feature in tqdm(self.repo_features, total=len(self.repo_features), desc="init ids"):
             self.repo_ids.add(repo_feature.repository.repo_id)
             self.repo_version_ids.add(f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}")
 
@@ -64,6 +64,7 @@ class FeatureEvaluator:
         with open(self.merged_feature_path, 'w') as f:
             json.dump(data, f, ensure_ascii=False)
         logger.info(f"dump finished.")
+
     def init_repo_features(self):
         """
         从文件初始化特征
