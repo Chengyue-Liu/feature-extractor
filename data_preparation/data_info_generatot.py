@@ -5,6 +5,7 @@ import os
 from loguru import logger
 from tqdm import tqdm
 
+from feature_extraction.constants import TARGET_FILE_EXTENSION_SET
 from feature_extraction.entities import Repository
 from settings import DECOMPRESSED_DEBIAN_FILE_DIR_PATH, SRC_REPOS_JSON, BIN_REPOS_JSON
 from utils.elf_utils import is_elf_file
@@ -41,6 +42,9 @@ def generate_repositories_json():
                     # source
                     src_path = os.path.join(version_path, "source")
                     if os.path.isdir(src_path):
+                        target_file_paths = [os.path.join(root, f) for root, dirs, files in os.walk(src_path)
+                                             for f in files
+                                             if f.endswith(tuple(TARGET_FILE_EXTENSION_SET))]
                         bin_repo = Repository(
                             repo_path=src_path,
                             repo_type="source",
@@ -48,6 +52,7 @@ def generate_repositories_json():
                             repo_name=repo_name,
                             version_id=version_id,
                             repo_version=version_number,
+                            target_src_file_num=len(target_file_paths)
                         )
                         src_repos.append(bin_repo)
 
@@ -95,3 +100,5 @@ def generate_repositories_json():
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
     dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
     logger.info(f"all finished.")
+
+    return src_repos, bin_repos

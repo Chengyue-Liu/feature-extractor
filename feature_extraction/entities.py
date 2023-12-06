@@ -27,6 +27,7 @@ class Repository:
                  repo_id, version_id, repo_name, repo_version,
                  package_name=None,
                  release_id=None, arch_id=None, repo_release=None, repo_arch=None,
+                 target_src_file_num=0,
                  elf_paths=None):
         self.repo_path = repo_path
         self.repo_type = repo_type
@@ -44,6 +45,7 @@ class Repository:
         self.arch_id = arch_id
         self.repo_arch = repo_arch
 
+        self.target_src_file_num=target_src_file_num
         self.elf_paths = elf_paths
 
     @classmethod
@@ -83,6 +85,7 @@ class Repository:
             "package_name": self.package_name,
             "repo_release": self.repo_release,
             "repo_arch": self.repo_arch,
+            "target_src_file_num": self.target_src_file_num,
             "elf_paths": self.elf_paths
 
         }
