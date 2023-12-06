@@ -189,7 +189,11 @@ class RepoFeature:
     def init_repo_features_from_json_data(cls, path):
         with open(path, 'rb') as file:
             repo_features = []
+            count = 0
             for item in ijson.items(file, 'item'):
+                count += 1
+                if count % 10000 == 0:
+                    logger.info(f"init_repo_features_from_json_data progress: {count}")
                 repository = Repository.init_repository_from_json_data(item["repository"])
                 file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
                                  for file_feature_json in item['file_features']]
