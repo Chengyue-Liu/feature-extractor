@@ -188,6 +188,24 @@ class RepoFeature:
 
     @classmethod
     def init_repo_features_from_json_data(cls, path):
+        # 下面是单进程逻辑
+        # with open(path, 'rb') as file:
+            # repo_features = []
+            # count = 0
+            # for item in ijson.items(file, 'item'):
+            #     count += 1
+            #     if count % 1000 == 0:
+            #         logger.info(f"init_repo_features_from_json_data progress: {count}")
+            #     repository = Repository.init_repository_from_json_data(item["repository"])
+            #     file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json)
+            #                      for file_feature_json in item['file_features']]
+            #     repo_features.append(RepoFeature(
+            #         repository=repository,
+            #         file_features=file_features
+            #     ))
+            # return repo_features
+
+        # 下面的逻辑是多进程读取，但是也没感觉快多少。
         with open(path, 'rb') as file:
             repo_features = []
             count = 0
