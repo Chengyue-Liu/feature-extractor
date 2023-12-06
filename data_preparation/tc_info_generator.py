@@ -4,6 +4,8 @@ import collections
 import json
 import random
 
+from loguru import logger
+
 from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, TEST_CASES_JSON_PATH, TEST_CASE_SAMPLE_SIZE_PER_REPO
 
 
@@ -35,7 +37,7 @@ def filter_test_cases(bin_repo_test_cases_dict):
         bin_repo_test_case_num += len(test_cases)
         for test_case in test_cases:
             bin_file_test_case_num += len(test_case["elf_paths"])
-    print(
+    logger.info(
         f"TEST_CASE_SAMPLE_SIZE_PER_REPO: {TEST_CASE_SAMPLE_SIZE_PER_REPO}\n"
         f"tc repo num: {len(bin_repo_test_cases_dict)}\n"
         f"tc repo version num: {bin_repo_test_case_num}\n"
@@ -57,9 +59,9 @@ def load_bin_repo_info(src_repo_ids):
             if repo_id in src_repo_ids:
                 bin_repo_test_cases_dict[repo_id].append(bin_repo)
                 bin_with_src_repo_num += 1
-    print(f"all bin package num: {all_bin_repo_num}\n"
-          f"bin package with elf repo num: {bin_repo_num}\n"
-          f"bin package with elf with src repo num: {bin_with_src_repo_num}\n")
+    logger.info(f"all bin package num: {all_bin_repo_num}\n"
+                f"bin package with elf repo num: {bin_repo_num}\n"
+                f"bin package with elf with src repo num: {bin_with_src_repo_num}\n")
     return bin_repo_test_cases_dict
 
 
@@ -78,7 +80,7 @@ def load_src_repo_info():
             version_id = src_repo["version_id"]
             version_key = f"{repo_id}-{version_id}"
             src_repo_version_ids.add(version_key)
-    print(f"all_src_repo_num: {all_src_repo_num}\n"
-          f"src repo with target file num: {len(src_repo_ids)}\n"
-          f"src repo version with target file num: {len(src_repo_version_ids)}\n")
+    logger.info(f"all_src_repo_num: {all_src_repo_num}\n"
+                f"src repo with target file num: {len(src_repo_ids)}\n"
+                f"src repo version with target file num: {len(src_repo_version_ids)}\n")
     return src_repo_ids

@@ -17,22 +17,25 @@ if __name__ == '__main__':
     """
     # step 1: 获取tar 文件路径
     logger.info("step 1: 获取tar 文件路径")
-    # src_tar_paths, bin_tar_paths = get_tar_file_paths()
+    src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
     # step 2: 解压
     logger.info("step 2: 解压")
-    # multiple_decompress(src_tar_paths, bin_tar_paths)
+    multiple_decompress(src_tar_paths, bin_tar_paths)
 
     # step 3: 生成源码和二进制文件路径
     logger.info("step 3: 生成源码和二进制文件路径")
-    # generate_repositories_json()
+    generate_repositories_json()
 
     # step 4: 简要统计
-    # statistic_data()
+    logger.info("step 4: 简要统计")
+    statistic_data()
 
     # step 5: 筛选测试用例
+    logger.info("step 5: 筛选测试用例")
     generate_tc_information()
 
+    logger.info(f"all finished.")
     """
     一些常用命令
     nohup python data_prepare_runner.py &
