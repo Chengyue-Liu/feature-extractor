@@ -55,28 +55,31 @@ class Repository:
         self.elf_paths = elf_paths  # elf文件路径
 
     @classmethod
-    def init_repository_from_json_data(cls, json_task):
+    def init_repository_from_json_data(cls, repo_json):
         repository = Repository(
-            repo_path=json_task["repo_path"],
-            repo_type=json_task["repo_type"],
-            repo_id=json_task["repo_id"],
-            repo_name=json_task["repo_name"],
-            repo_version=json_task["repo_version"],
-            version_id=json_task["version_id"],
-            repo_release=json_task["repo_release"],
-            release_id=json_task["release_id"],
-            repo_arch=json_task["repo_arch"],
-            arch_id=json_task["arch_id"],
+            repo_path=repo_json["repo_path"],
+            repo_type=repo_json["repo_type"],
+            repo_id=repo_json["repo_id"],
+            repo_name=repo_json["repo_name"],
+            repo_version=repo_json["repo_version"],
+            package_name=repo_json["package_name"],
+            version_id=repo_json["version_id"],
+            repo_release=repo_json["repo_release"],
+            release_id=repo_json["release_id"],
+            repo_arch=repo_json["repo_arch"],
+            arch_id=repo_json["arch_id"],
+            target_src_file_num=repo_json["target_src_file_num"],
+            elf_paths=repo_json["elf_paths"],
         )
         return repository
 
     @classmethod
     def init_repositories_from_json_file(cls, json_path):
         json_repositories = load_from_json(json_path)
-        tasks = []
+        repositories = []
         for json_repository in json_repositories:
-            tasks.append(cls.init_repository_from_json_data(json_repository))
-        return tasks
+            repositories.append(cls.init_repository_from_json_data(json_repository))
+        return repositories
 
     def custom_serialize(self):
         return {
