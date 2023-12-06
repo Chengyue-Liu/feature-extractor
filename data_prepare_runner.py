@@ -10,6 +10,9 @@ from data_preparation.data_decompress.tar_file_manager import get_tar_file_paths
 from data_preparation.data_info_generatot import generate_repositories_json
 
 if __name__ == '__main__':
+    """
+    解压文件，生成文件路径和id信息
+    """
     # step 1: 获取tar 文件路径
     logger.info("step 1: 获取tar 文件路径")
     src_tar_paths, bin_tar_paths = get_tar_file_paths()
@@ -21,6 +24,7 @@ if __name__ == '__main__':
     # step 3: 生成源码和二进制文件路径
     logger.info("step 3: 生成源码和二进制文件路径")
     generate_repositories_json()
+
 
     """
     一些常用命令
