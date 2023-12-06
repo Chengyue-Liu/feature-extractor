@@ -10,10 +10,10 @@ from data_preparation.data_info_generatot import generate_repositories_json
 
 if __name__ == '__main__':
     # step 1: 获取tar 文件路径
-    # src_tar_paths, bin_tar_paths = get_tar_file_paths()
+    src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
     # step 2: 解压
-    # multiple_decompress(src_tar_paths, bin_tar_paths)
+    multiple_decompress(src_tar_paths, bin_tar_paths)
 
     # step 3: 生成源码和二进制文件路径
     generate_repositories_json()
