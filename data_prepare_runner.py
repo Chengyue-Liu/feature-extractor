@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from loguru import logger
 
+from data_preparation.data_decompress.decompressor import multiple_decompress
+from data_preparation.data_decompress.tar_file_manager import get_tar_file_paths
 from data_preparation.data_info_generatot import generate_repositories_json
 from data_preparation.data_statistics import statistic_data
 from data_preparation.tc_info_generator import generate_tc_information
@@ -15,11 +17,11 @@ if __name__ == '__main__':
     """
     # step 1: 获取tar 文件路径
     logger.info("step 1: 获取tar 文件路径")
-    # src_tar_paths, bin_tar_paths = get_tar_file_paths()
+    src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
     # step 2: 解压
     logger.info("step 2: 解压")
-    # multiple_decompress(src_tar_paths, bin_tar_paths)
+    multiple_decompress(src_tar_paths, bin_tar_paths)
 
     # step 3: 生成源码和二进制文件路径
     logger.info("step 3: 生成源码和二进制文件路径")
@@ -40,7 +42,7 @@ if __name__ == '__main__':
     
     ps aux | grep "python data_prepare_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
     ps aux | grep "unar" | grep -v grep | awk '{print $2}' | xargs kill
-    ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
+    ps aux | grep "rsync -r --delete" | grep -v grep | awk '{print $2}' | xargs kill
     
     ps aux | grep "rm -rf" | grep -v grep | awk '{print $2}' | xargs kill
     
