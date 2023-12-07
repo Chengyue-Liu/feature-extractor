@@ -64,6 +64,31 @@ def unar_decompress(archive_path, target_dir):
         logger.error(traceback.format_exc())
 
 
+def dpkg_decompress(file_path, target_folder):
+    # 检查文件路径和目标文件夹是否存在
+    if not os.path.exists(file_path):
+        logger.info(f"Error: File '{file_path}' not found.")
+        return
+
+    if not os.path.exists(target_folder):
+        logger.info(f"Error: Target folder '{target_folder}' not found.")
+        return
+
+    # 检查文件扩展名是否为 .deb 或 .udeb
+    if not file_path.lower().endswith(('.deb', '.udeb')):
+        logger.info(f"Error: Invalid file extension. The file must have a .deb or .udeb extension.")
+        return
+
+    # 构造 dpkg-deb 命令
+    command = ['dpkg-deb', '-x', file_path, target_folder]
+
+    try:
+        # 调用 dpkg-deb 命令进行解压缩
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        logger.info(f"Error: Failed to extract contents. {e}")
+
+
 def decompress(archive_path):
     try:
         # 获取target_dir
@@ -72,24 +97,11 @@ def decompress(archive_path):
         # 如果目标文件夹已经存在，跳过
         if os.path.exists(target_dir):
             return
+        os.makedirs(target_dir, exist_ok=True)
 
         # 二进制
-        if archive_path.endswith('deb'):
-            # 创建临时文件夹
-            tmp_dir = f"{target_dir}_tmp"
-            if os.path.exists(tmp_dir):
-                shutil.rmtree(tmp_dir)
-            os.makedirs(tmp_dir)
-
-            # 解压 deb 到 临时文件夹
-            unar_decompress(archive_path, tmp_dir)
-
-            # 解压 data.tar.gz 到 目标文件夹
-            data_file_path = find_data_tar_gz(tmp_dir)
-            unar_decompress(data_file_path, target_dir)
-
-            # 删除临时文件夹
-            shutil.rmtree(tmp_dir)
+        if archive_path.endswith(('.deb', ".udeb")):
+            dpkg_decompress(archive_path, target_dir)
         # 源码
         else:
             unar_decompress(archive_path, target_dir)

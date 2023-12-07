@@ -44,26 +44,29 @@ def get_tar_file_paths():
     return src_tar_paths, bin_tar_paths
 
 
-def filter_bin_tar_paths(bin_tar_paths):
-    filtered_bin_tar_paths = []
-    for bin_tar_path in tqdm(bin_tar_paths, "filter_bin_tar_paths"):
-        if bin_tar_path.startswith(("python-", "ruby-", "perl-", "fonts-")):
+def filter_bin_tar_paths(src_tar_paths, bin_tar_paths):
+    src_tar_paths = _filter_paths(src_tar_paths)
+    bin_tar_paths = _filter_paths(bin_tar_paths)
+    return src_tar_paths, bin_tar_paths
+
+
+def _filter_paths(paths):
+    filtered_paths = []
+    for path in tqdm(paths, "_filter_paths"):
+        if path.startswith(("python-", "ruby-", "perl-", "fonts-")):
             continue
 
         skip = False
         for arch in {"_armel", "_armhf", "_i386", "_mips", "_ppc", "_s390", "_riscv", "-doc_",
                      "-ocaml-", "-python-", "-python3-", "-ruby-", "-perl-", "-php-", "-java-",
                      "-lua-", "-nodejs-", "-haskell-", "-rust-", "-go-"}:
-            if arch in os.path.split(bin_tar_path)[-1]:
+            if arch in os.path.split(path)[-1]:
                 skip = True
                 break
 
         if skip:
             continue
 
-        filtered_bin_tar_paths.append(bin_tar_path)
-
-    ends = {path.split("_")[-1] for path in filtered_bin_tar_paths}
-    for i, end in enumerate(ends, 1):
-        print(i, end)
-    logger.info(f"{len(bin_tar_paths)} ---> {len(filtered_bin_tar_paths)}")
+        filtered_paths.append(path)
+    logger.info(f"{len(paths)} ---> {len(filtered_paths)}")
+    return filtered_paths

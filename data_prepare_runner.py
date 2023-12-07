@@ -19,9 +19,9 @@ if __name__ == '__main__':
     logger.info("step 1: 获取tar 文件路径")
     src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
-    # 筛选
+    # 筛选掉不常用架构和非c/cpp语言的包
     logger.info("step x: 筛选bin 路径")
-    bin_tar_paths = filter_bin_tar_paths(bin_tar_paths)
+    src_tar_paths,bin_tar_paths = filter_bin_tar_paths(src_tar_paths,bin_tar_paths)
 
     # step 2: 解压
     logger.info("step 2: 解压")
