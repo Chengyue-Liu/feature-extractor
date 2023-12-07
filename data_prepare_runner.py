@@ -3,7 +3,7 @@
 from loguru import logger
 
 from data_preparation.data_decompress.decompressor import multiple_decompress
-from data_preparation.data_decompress.tar_file_manager import get_tar_file_paths
+from data_preparation.data_decompress.tar_file_manager import get_tar_file_paths, filter_bin_tar_paths
 from data_preparation.data_info_generatot import generate_repositories_json
 from data_preparation.data_statistics import statistic_data
 from data_preparation.tc_info_generator import generate_tc_information
@@ -19,21 +19,24 @@ if __name__ == '__main__':
     logger.info("step 1: 获取tar 文件路径")
     src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
+    # 筛选
+    bin_tar_paths = filter_bin_tar_paths(bin_tar_paths)
+
     # step 2: 解压
     logger.info("step 2: 解压")
-    multiple_decompress(src_tar_paths, bin_tar_paths)
+    # multiple_decompress(src_tar_paths, bin_tar_paths)
 
     # step 3: 生成源码和二进制文件路径
     logger.info("step 3: 生成源码和二进制文件路径")
-    generate_repositories_json()
+    # generate_repositories_json()
 
     # step 4: 简要统计
     logger.info("step 4: 简要统计")
-    statistic_data()
+    # statistic_data()
 
     # step 5: 筛选测试用例ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
     logger.info("step 5: 筛选测试用例")
-    generate_tc_information()
+    # generate_tc_information()
 
     logger.info(f"all finished.")
     """
