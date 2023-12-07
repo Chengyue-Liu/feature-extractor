@@ -19,7 +19,7 @@ from settings import SRC_REPOS_JSON, BIN_REPOS_JSON, TC_BIN_REPOS_JSON
 def main():
     # 提取特征
     logger.info(f"提取二进制特征")
-    bin_repos = Repository.init_repositories_from_json_file(TC_BIN_REPOS_JSON)
+    bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
     extractor = BinStringExtractor(bin_repos)
     extractor.multiple_run()
 
