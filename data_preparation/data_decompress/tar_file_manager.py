@@ -61,4 +61,7 @@ def filter_bin_tar_paths(bin_tar_paths):
 
         filtered_bin_tar_paths.append(bin_tar_path)
 
+    ends = {path.split("_")[-1] for path in filtered_bin_tar_paths}
+    for end in ends:
+        print(end)
     logger.info(f"{len(bin_tar_paths)} ---> {len(filtered_bin_tar_paths)}")
