@@ -11,7 +11,7 @@ def get_paths(root_dir):
     for root, dirs, files in os.walk(root_dir):
         for dir in dirs:
             dir_paths.append(os.path.join(root, dir))
-            if (num := len(dir_paths)) % 10000 == 0:
+            if (num := len(dir_paths)) % 1000 == 0:
                 num = num/1000
                 logger.info(f"get_paths: {num}k")
     dir_paths = list(reversed(dir_paths))
