@@ -46,7 +46,7 @@ def get_tar_file_paths():
 
 def filter_bin_tar_paths(bin_tar_paths):
     filtered_bin_tar_paths = []
-    for bin_tar_path in bin_tar_paths:
+    for bin_tar_path in tqdm(bin_tar_paths, "filter_bin_tar_paths"):
         skip = False
         for arch in {"_armel", "_armhf", "_i386", "_mips", "_ppc", "_s390", "_riscv"}:
             if arch in os.path.split(bin_tar_path)[-1]:

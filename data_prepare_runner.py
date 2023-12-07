@@ -20,6 +20,7 @@ if __name__ == '__main__':
     src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
     # 筛选
+    logger.info("step x: 筛选bin 路径")
     bin_tar_paths = filter_bin_tar_paths(bin_tar_paths)
 
     # step 2: 解压
