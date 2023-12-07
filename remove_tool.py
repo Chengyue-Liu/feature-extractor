@@ -32,5 +32,5 @@ def remove_all(root_dir):
 
 
 if __name__ == '__main__':
-    root_dir_path = input()
+    root_dir_path = "/root/DATA/liuchengyue/results/feature_extractor_result/decompressed_debian_mirror"
     remove_all(root_dir_path)
