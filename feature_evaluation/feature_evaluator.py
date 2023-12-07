@@ -28,7 +28,6 @@ class FeatureEvaluator:
         # repo features
         self.repo_features: List[RepoFeature] = self.init_repo_features()
 
-
         # 初始化id集合
         logger.info(f"init ids")
         self.repo_ids = set()

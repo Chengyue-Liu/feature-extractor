@@ -27,7 +27,7 @@ class BinStringEvaluator(FeatureEvaluator):
         self.bin_string_feature_dict = dict()
         for repo_feature in self.repo_features:
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
-            if not self.bin_string_feature_dict.get(key):
+            if not self.bin_string_feature_dict.get(repo_feature.repository.version_key):
                 self.bin_string_feature_dict[key] = BinStringFeature(repo_feature)
             else:
                 self.bin_string_feature_dict[key].strings.update(BinStringFeature(repo_feature).strings)

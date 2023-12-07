@@ -8,16 +8,10 @@
 # @Software: PyCharm
 import dataclasses
 import json
-import multiprocessing
-import os
 from typing import List
 
-import ijson
-from loguru import logger
-from tqdm import tqdm
-
-from settings import DECOMPRESSED_DEBIAN_FILE_DIR_PATH, SRC_REPOS_JSON, BIN_REPOS_JSON
-from utils.json_util import dump_to_json, load_from_json
+from utils.json_util import load_from_json
+from uuid import uuid4
 
 
 @dataclasses.dataclass
@@ -25,10 +19,14 @@ class Repository:
     def __init__(self,
                  repo_path, repo_type,
                  repo_id, version_id, repo_name, repo_version,
+                 uuid=None,
+                 version_key=None,
                  package_name=None,
                  release_id=None, arch_id=None, repo_release=None, repo_arch=None,
                  target_src_file_num=0,
                  elf_paths=None):
+        self.uuid = uuid if uuid else str(uuid4())
+
         # basic
         self.repo_path = repo_path
         self.repo_type = repo_type
@@ -39,6 +37,7 @@ class Repository:
 
         # version
         self.version_id = version_id
+        self.version_key = version_key if version_key else f"{self.repo_id}-{self.version_id}"
         self.repo_version = repo_version
 
         # package, release
@@ -57,6 +56,7 @@ class Repository:
     @classmethod
     def init_repository_from_json_data(cls, json_data):
         repository = Repository(
+            uuid=json_data["uuid"],
             repo_path=json_data["repo_path"],
             repo_type=json_data["repo_type"],
             repo_id=json_data["repo_id"],
@@ -64,6 +64,7 @@ class Repository:
             repo_version=json_data["repo_version"],
             package_name=json_data["package_name"],
             version_id=json_data["version_id"],
+            version_key=json_data["version_key"],
             repo_release=json_data["repo_release"],
             release_id=json_data["release_id"],
             repo_arch=json_data["repo_arch"],
@@ -83,10 +84,12 @@ class Repository:
 
     def custom_serialize(self):
         return {
+            "uuid": self.uuid,
             "repo_path": self.repo_path,
             "repo_type": self.repo_type,
             "repo_id": self.repo_id,
             "version_id": self.version_id,
+            "version_key": self.version_key,
             "release_id": self.release_id,
             "arch_id": self.arch_id,
             "repo_name": self.repo_name,
@@ -96,7 +99,6 @@ class Repository:
             "repo_arch": self.repo_arch,
             "target_src_file_num": self.target_src_file_num,
             "elf_paths": self.elf_paths
-
         }
 
 
