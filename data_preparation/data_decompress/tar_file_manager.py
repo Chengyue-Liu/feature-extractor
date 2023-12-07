@@ -51,7 +51,9 @@ def filter_bin_tar_paths(bin_tar_paths):
             continue
 
         skip = False
-        for arch in {"_armel", "_armhf", "_i386", "_mips", "_ppc", "_s390", "_riscv", "-doc_"}:
+        for arch in {"_armel", "_armhf", "_i386", "_mips", "_ppc", "_s390", "_riscv", "-doc_",
+                     "-ocaml-", "-python-", "-python3-", "-ruby-", "-perl-", "-php-", "-java-",
+                     "-lua-", "-nodejs-", "-haskell-", "-rust-", "-go-"}:
             if arch in os.path.split(bin_tar_path)[-1]:
                 skip = True
                 break
