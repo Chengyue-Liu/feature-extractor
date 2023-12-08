@@ -35,7 +35,7 @@ TC_BIN_REPOS_JSON = env.str("TC_BIN_REPOS_JSON", "resources/repository_json/tc_b
 FEATURE_RESULT_DIR = env.str("FEATURE_RESULT_DIR", "features")
 
 # CFG 特征最少的边的数量
-FCG_EDGE_NUM_THRESHOLD = 5
+EDGE_NUM_THRESHOLD = 5
 
 # feature evaluation
 TEST_CASES_JSON_PATH = env.str("TEST_CASES_JSON_PATH", "resources/repository_json/test_cases.json")

@@ -10,7 +10,7 @@ import dataclasses
 import json
 from typing import List, Dict
 
-from settings import FCG_EDGE_NUM_THRESHOLD
+from settings import EDGE_NUM_THRESHOLD
 from utils.json_util import load_from_json
 from uuid import uuid4
 
@@ -255,7 +255,7 @@ class FunctionFeature:
         json_data = dict()
 
         # 如果至少5个边，保存CFG
-        if len(self.basic_blocks) >= FCG_EDGE_NUM_THRESHOLD:
+        if len(self.basic_blocks) >= EDGE_NUM_THRESHOLD:
             json_data = {
                 "function_name": self.function_name,
                 "caller_num": self.caller_num,
