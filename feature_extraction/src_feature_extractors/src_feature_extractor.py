@@ -35,6 +35,7 @@ class NodeType(enum.Enum):
     function_declarator = "function_declarator"  # 函数声明
     function_definition = "function_definition"  # 函数定义
     string_literal = 'string_literal'  # 字符串节点
+    number_literal = 'number_literal'  # 数字
     string_content = 'string_content'  # 字符串内容
     escape_sequence = 'escape_sequence'  # 字符串内容
     preproc_include = 'preproc_include'  # 头文件

@@ -17,7 +17,7 @@ class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
     def extract_file_feature(self, file_path, root_node) -> FileFeature:
 
         # 提取字符串
-        strings = self.parse_strings(root_node)
+        strings, numbers = self.parse_strings_numbers(root_node)
 
         function_names = self.parse_function_names(root_node)
 
@@ -26,20 +26,28 @@ class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
             file_path=file_path,
             feature={
                 "strings": list(set(strings)),
+                "numbers": list(numbers),
                 "function_names": list(set(function_names)),
             }
 
         )
         return file_feature
 
-    def parse_strings(self, node):
+    def parse_strings_numbers(self, node):
         strings = []
+        numbers = set()
         flag = False  # 上一个是不是字符串，主要用来合并多行字符串
         stack = [node]  # 使用栈来模拟递归调用
 
         while stack:
             current_node = stack.pop()
-
+            if current_node.type == NodeType.number_literal.value:
+                node_content_lines = self.parse_node_content(current_node)
+                # 获取字符串内容
+                number_content = node_content_lines[0]
+                print(current_node.type, number_content)
+                numbers.add(number_content)
+            # content = self.parse_node_content(current_node)
             # 处理当前节点
             # 如果是字符串内容节点（双引号中间的部分）
             if current_node.type == NodeType.string_content.value:
@@ -67,7 +75,7 @@ class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
 
             # 将子节点压入栈中
             stack.extend(reversed(current_node.children))
-        return strings
+        return strings, numbers
 
     def parse_function_names(self, node):
         function_names = []
@@ -127,6 +135,9 @@ class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
             # 将子节点压入栈中
             stack.extend(reversed(current_node.children))
         return function_names
+
+    def parse_integers(self):
+        pass
 
 
 def process_node_name(node_name):
