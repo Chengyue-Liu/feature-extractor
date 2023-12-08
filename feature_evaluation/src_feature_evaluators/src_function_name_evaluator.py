@@ -10,8 +10,8 @@ from tqdm import tqdm
 from feature_evaluation.entities import SrcStringFeature, SrcFunctionNameFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
-from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
-    SrcStringAndFunctionNameExtractor
+from feature_extraction.src_feature_extractors.src_feature_tree_sitter_extractor import \
+    SrcFeatureTreeSitterExtractor
 from settings import SRC_STRING_SCA_THRESHOLD, SRC_FUNCTION_NAME_SCA_THRESHOLD
 from utils.elf_utils import extract_elf_strings
 
@@ -24,7 +24,7 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
     def __init__(self):
         logger.info(f"{self.__class__.__name__} initing...")
         # bin_string_features
-        super().__init__(SrcStringAndFunctionNameExtractor.__name__)
+        super().__init__(SrcFeatureTreeSitterExtractor.__name__)
 
         # 转换特征
         logger.info("convert feature")

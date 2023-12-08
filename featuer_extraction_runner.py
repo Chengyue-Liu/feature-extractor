@@ -5,8 +5,8 @@ from loguru import logger
 
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.entities import Repository
-from feature_extraction.src_feature_extractors.src_string_and_funtion_name_extractor import \
-    SrcStringAndFunctionNameExtractor
+from feature_extraction.src_feature_extractors.src_feature_tree_sitter_extractor import \
+    SrcFeatureTreeSitterExtractor
 from settings import SRC_REPOS_JSON, BIN_REPOS_JSON, TC_BIN_REPOS_JSON
 
 
@@ -26,7 +26,7 @@ def main():
     # 源码字符串
     logger.info(f"提取源码特征")
     src_repos = Repository.init_repositories_from_json_file(SRC_REPOS_JSON)
-    extractor = SrcStringAndFunctionNameExtractor(src_repos[:1])
+    extractor = SrcFeatureTreeSitterExtractor(src_repos[:1])
     extractor.multiple_run()
 
     logger.info("all done.")

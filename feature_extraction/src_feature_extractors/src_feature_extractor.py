@@ -95,6 +95,7 @@ class SrcFeatureExtractor:
         for path in target_file_paths:
             node = self.init_root_node(path)
             file_feature = self.extract_file_feature(path, node)
+            file_feature.file_path = os.path.relpath(file_feature.file_path, task.repo_path)
             file_features.append(file_feature)
 
         # 生成仓库特征

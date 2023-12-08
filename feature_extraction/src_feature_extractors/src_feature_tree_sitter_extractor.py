@@ -12,7 +12,7 @@ from feature_extraction.entities import FileFeature
 from feature_extraction.src_feature_extractors.src_feature_extractor import SrcFeatureExtractor, NodeType
 
 
-class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
+class SrcFeatureTreeSitterExtractor(SrcFeatureExtractor):
 
     def extract_file_feature(self, file_path, root_node) -> FileFeature:
 
@@ -45,8 +45,9 @@ class SrcStringAndFunctionNameExtractor(SrcFeatureExtractor):
                 node_content_lines = self.parse_node_content(current_node)
                 # 获取字符串内容
                 number_content = node_content_lines[0]
-                print(current_node.type, number_content)
+                # print(current_node.type, number_content)
                 numbers.add(number_content)
+                continue
             # content = self.parse_node_content(current_node)
             # 处理当前节点
             # 如果是字符串内容节点（双引号中间的部分）
