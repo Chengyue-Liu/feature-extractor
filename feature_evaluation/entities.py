@@ -36,7 +36,7 @@ class BinStringFeature:
         self.repository: Repository = repo_feature.repository
         self.strings: Set[str] = set()
         for file_feature in repo_feature.file_features:
-            self.strings.update(file_feature.feature)
+            self.strings.update(file_feature.feature["strings"])
 
 
 class TestCase:

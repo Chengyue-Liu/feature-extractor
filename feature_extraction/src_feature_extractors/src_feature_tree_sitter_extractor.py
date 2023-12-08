@@ -26,8 +26,8 @@ class SrcFeatureTreeSitterExtractor(SrcFeatureExtractor):
             file_path=file_path,
             feature={
                 "strings": list(set(strings)),
-                "numbers": list(numbers),
                 "function_names": list(set(function_names)),
+                "numbers": list(numbers),
             }
 
         )
