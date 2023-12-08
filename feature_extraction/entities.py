@@ -10,9 +10,6 @@ import dataclasses
 import json
 from typing import List, Dict
 
-
-
-
 from settings import FCG_EDGE_NUM_THRESHOLD
 from utils.json_util import load_from_json
 from uuid import uuid4
@@ -150,7 +147,10 @@ class RepoFeature:
                 file_features=file_features
             )
 
+
 from binaryninja import Function, BasicBlock, BinaryViewType, BinaryView
+
+
 class BasicBlockFeature:
     """
     BasicBlock
@@ -189,12 +189,22 @@ class BasicBlockFeature:
         self.index = int(bb.index)
         self.outgoing_edges = [(int(edge.source.index), int(edge.target.index)) for edge in bb.outgoing_edges]
 
+        # ACFG Attributes
+        self.length = bb.length
+        self.incoming_edge_num = len(bb.incoming_edges)
+        self.outgoing_edge_num = len(bb.outgoing_edges)
+        self.instruction_num = bb.instruction_count
+
     def __repr__(self):
         return f"BasicBlock({self.index}), edge_num: {len(self.outgoing_edges)}"
 
     def custom_serialize(self):
         return {
             "index": self.index,
+            "length": self.length,
+            "incoming_edge_num": self.incoming_edge_num,
+            "outgoing_edge_num": self.outgoing_edge_num,
+            "instruction_num": self.instruction_num,
             "outgoing_edges": [f"{edge[0]}-{edge[1]}" for edge in self.outgoing_edges],
         }
 
@@ -221,22 +231,39 @@ class FunctionFeature:
         high_level_il： 高级中间表示（High Level Intermediate Language）的表示。
     """
 
-    def __init__(self, function_name: str, basic_block_features: List[BasicBlockFeature]):
+    def __init__(self, function_name, func: Function):
+        # 函数名称
         self.function_name = function_name
-        self.cfg: List[BasicBlockFeature] = basic_block_features
+
+        # 其他信息
+        self.caller_num = len(func.callers)
+        self.callee_num = len(func.callees)
+        self.parameter_num = len(func.parameter_vars)
+        self.basic_block_num = len(func.basic_blocks)
+        self.edge_num = 0
+
+        # basic blocks
+        self.basic_blocks: List[BasicBlockFeature] = []
+        for bb in func.basic_blocks:
+            self.basic_blocks.append(BasicBlockFeature(bb))
+            self.edge_num += len(bb.outgoing_edges)
 
     def __repr__(self):
-        return f"{self.function_name}, {self.cfg}"
+        return f"{self.function_name}, {self.basic_blocks}"
 
     def custom_serialize(self):
         json_data = dict()
 
         # 如果至少5个边，保存CFG
-        if len(self.cfg) >= FCG_EDGE_NUM_THRESHOLD:
-            json_data["cfg"] = [bbf.custom_serialize() for bbf in self.cfg]
+        if len(self.basic_blocks) >= FCG_EDGE_NUM_THRESHOLD:
             json_data = {
                 "function_name": self.function_name,
-                "cfg": [bbf.custom_serialize() for bbf in self.cfg]
+                "caller_num": self.caller_num,
+                "callee_num": self.callee_num,
+                "parameter_num": self.parameter_num,
+                "basic_block_num": self.basic_block_num,
+                "edge_num": self.edge_num,
+                "basic_blocks": [bbf.custom_serialize() for bbf in self.basic_blocks]
             }
 
         return json_data if json_data else None

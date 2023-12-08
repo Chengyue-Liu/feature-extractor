@@ -29,23 +29,19 @@ def ninja_binary(path):
     fcg_dict = collections.defaultdict(set)
     function_features = []
     for func in tqdm(bv.functions, total=len(bv.functions), desc="walk functions"):
-        # 函数名称
-        if func.name.startswith("sub_") and len(func.name) == 9:
-            function_name = None
-        else:
-            function_name = func.name
-            function_names.add(function_name)
         # fcg
         for callee in func.callees:
             fcg_dict[func.name].add(callee.name)
 
-        # blocks
-        basic_block_features = []
-        for bb in func.basic_blocks:
-            basic_block_features.append(BasicBlockFeature(bb))
+        # 函数名称
+        if not(func.name.startswith("sub_") and len(func.name) == 9):
+            function_name = None
+        else:
+            function_name = func.name
+            function_names.add(function_name)
 
         # feature
-        function_feature = FunctionFeature(function_name, basic_block_features)
+        function_feature = FunctionFeature(function_name, func)
         function_features.append(function_feature)
     # 序列化
     function_names = list(function_names)
