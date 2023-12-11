@@ -106,7 +106,7 @@ def find_c_and_cpp_files(args):
 def generate_repositories_json():
     logger.info(f"get_version_dir_paths")
     results = get_useful_version_dir_paths()
-    pool_size = 20
+    pool_size = multiprocessing.cpu_count()
     with Pool(pool_size) as pool:
         # 使用 pool.map 异步处理每个 repository
         results = list(tqdm(pool.imap_unordered(find_c_and_cpp_files, results), total=len(results),
