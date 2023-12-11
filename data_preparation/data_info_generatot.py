@@ -210,8 +210,9 @@ def generate_repositories_json():
     #     bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
     #                           total=len(bin_repos),
     #                           desc="step 3: filter elf files"))
+    logger.info(f"extension_dict")
     extension_dict = dict()
-    for repo in bin_repos:
+    for repo in tqdm(bin_repos):
         for path in repo.elf_paths:
             dir_name, file_name = os.path.split(path)
             pure_name, extension = os.path.splitext(file_name)
