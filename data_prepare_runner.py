@@ -34,11 +34,11 @@ if __name__ == '__main__':
 
     # step 4: 简要统计
     logger.info("step 4: 简要统计")
-    statistic_data()
+    # statistic_data()
 
     # step 5: 筛选测试用例ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
     logger.info("step 5: 筛选测试用例")
-    generate_tc_information()
+    # generate_tc_information()
 
     logger.info(f"all finished.")
     """
