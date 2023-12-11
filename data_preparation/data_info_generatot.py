@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import collections
 import multiprocessing
 import os
 from multiprocessing.dummy import Pool
@@ -33,6 +34,15 @@ def is_filter_repo(repo_name):
     return False
 
 
+def is_filter_file(elf_path):
+    dir_name, elf_name = os.path.split(elf_path)
+    pure_name, extension = os.path.splitext(elf_name)
+    if extension in {'.gz', '.txt', '.Debian','.cnf'}:
+        return True
+
+    return False
+
+
 def get_version_dir_paths():
     repo_id = 0
     version_id = 0
@@ -42,22 +52,27 @@ def get_version_dir_paths():
         if not os.path.isdir(category_path):
             continue
         for repo_name in os.listdir(category_path):
+            # 过滤其他语言
             if is_filter_repo(repo_name):
                 continue
+            # 不存在的过滤
             library_path = os.path.join(category_path, repo_name)
             if not os.path.isdir(library_path):
                 continue
             repo_id += 1
             for version_number in os.listdir(library_path):
+                # 不存在的过滤
                 version_path = os.path.join(library_path, version_number)
                 if not os.path.isdir(version_path):
                     continue
                 version_id += 1
                 if version_id % 1000 == 0:
                     logger.info(f"get_version_dir_paths progres: {version_id}")
+                # 没有源码过滤
                 src_path = os.path.join(version_path, "source")
                 if not os.path.isdir(src_path):
                     continue
+                # 没有二进制过滤
                 binary_path = os.path.join(version_path, "binary")
                 if not os.path.isdir(binary_path):
                     continue
@@ -99,7 +114,7 @@ def generate_repositories_json():
     for repo_id, repo_name, version_id, version_number, version_path, target_file_paths in tqdm(results,
                                                                                                 total=len(results),
                                                                                                 desc="generate_repositories_json"):
-        # 没有c/cpp 源码，直接跳过
+        # 没有c/cpp 源码，过滤
         if len(target_file_paths) == 0:
             continue
 
@@ -136,8 +151,11 @@ def generate_repositories_json():
                     for root, dirs, files in os.walk(arch_path):
                         for file_name in files:
                             file_path = os.path.join(root, file_name)
-                            if is_elf_file(file_path):
-                                elf_paths.append(file_path)
+                            if is_filter_file(file_path):
+                                continue
+                            # if is_elf_file(file_path):
+                            #     elf_paths.append(file_path)
+                            elf_paths.append(file_path)
                     bin_repo = Repository(
                         repo_path=arch_path,
                         repo_type="binary",
@@ -153,6 +171,14 @@ def generate_repositories_json():
                         elf_paths=elf_paths
                     )
                     bin_repos.append(bin_repo)
+    extension_list = list()
+    for bin_repo in bin_repos:
+        for elf_path in bin_repo.elf_paths:
+            dir_name, elf_name = os.path.split(elf_path)
+            pure_name, extension = os.path.splitext(elf_name)
+            extension_list.append(extension)
+    counter = collections.Counter(extension_list)
+    logger.info(counter.most_common(20))
 
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
