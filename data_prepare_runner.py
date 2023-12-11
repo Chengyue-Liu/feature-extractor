@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # step 3: 生成源码和二进制文件路径[这个过程中有后续补充的筛选逻辑]
     logger.info("step 3: 生成源码和二进制文件路径")
     generate_repositories_json()
-    # 大概的数量：src_repo: , bin_repo:
+    # 大概的数量：src_repo:54k , bin_repo:
 
     # step 4: 简要统计
     logger.info("step 4: 简要统计")

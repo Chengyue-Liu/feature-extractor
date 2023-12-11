@@ -147,7 +147,7 @@ def generate_repositories_json():
 
         # source
         src_path = os.path.join(version_path, "source")
-        bin_repo = Repository(
+        src_repo = Repository(
             repo_path=src_path,
             repo_type="source",
             repo_id=repo_id,
@@ -156,7 +156,7 @@ def generate_repositories_json():
             repo_version=version_number,
             target_src_file_num=len(target_file_paths)
         )
-        src_repos.append(bin_repo)
+        src_repos.append(src_repo)
 
         # binary
         binary_path = os.path.join(version_path, "binary")
@@ -180,6 +180,7 @@ def generate_repositories_json():
                             file_path = os.path.join(root, file_name)
                             if is_filter_file(file_path):
                                 continue
+                            # 此处只是筛选掉了明显不是的elf，添加进去的这些，也不代表都是ELF, 还需要后面进一步的确认。
                             elf_paths.append(file_path)
                     bin_repo = Repository(
                         repo_path=arch_path,
@@ -202,16 +203,16 @@ def generate_repositories_json():
     with Pool(pool_size) as pool:
         # 使用 pool.map 异步处理每个 repository
         bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
-                              total=len(results),
+                              total=len(bin_repos),
                               desc="filter elf files"))
 
     # 过滤掉没有elf文件的二进制库
     logger.info(f"filter bin_repos")
-    bin_repos = [repo for repo in bin_repos if repo.elf_paths]
+    filtered_bin_repos = [repo for repo in bin_repos if repo.elf_paths]
 
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
-    dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
-    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}")
+    dump_to_json([repo.custom_serialize() for repo in filtered_bin_repos], BIN_REPOS_JSON)
+    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(filtered_bin_repos)}")
     logger.info(f"all finished.")
-    return src_repos, bin_repos
+    return src_repos, filtered_bin_repos
