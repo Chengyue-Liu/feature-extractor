@@ -33,6 +33,8 @@ def get_version_dir_paths():
                 if not os.path.isdir(version_path):
                     continue
                 version_id += 1
+                if version_id % 1000 == 0:
+                    logger.info(f"get_version_dir_paths progres: {version_id}")
                 results.append((repo_id, repo_name, version_id, version_number, version_path))
     return results
 
