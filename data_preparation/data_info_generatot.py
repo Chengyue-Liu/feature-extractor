@@ -129,11 +129,13 @@ def generate_repositories_json():
     logger.info(f"get_version_dir_paths")
     results = get_useful_version_dir_paths()
     pool_size = multiprocessing.cpu_count()
+    # step 1: 多进程筛选源码c/cpp文件
     with Pool(pool_size) as pool:
         # 使用 pool.map 异步处理每个 repository
         results = list(tqdm(pool.imap_unordered(find_c_and_cpp_files, results), total=len(results),
                             desc="find c files"))
 
+    # step 2: 初始化 src_repo, bin_repo
     src_repos = []
     bin_repos = []
     release_id = 0
@@ -198,7 +200,7 @@ def generate_repositories_json():
                     )
                     bin_repos.append(bin_repo)
 
-    # 多进程筛选elf文件
+    # step 3: 多进程筛选bin repo 的 elf文件
     pool_size = multiprocessing.cpu_count()
     with Pool(pool_size) as pool:
         # 使用 pool.map 异步处理每个 repository
@@ -206,10 +208,11 @@ def generate_repositories_json():
                               total=len(bin_repos),
                               desc="filter elf files"))
 
-    # 过滤掉没有elf文件的二进制库
+    # step 4: 过滤掉没有elf文件的二进制库
     logger.info(f"filter bin_repos")
     filtered_bin_repos = [repo for repo in bin_repos if repo.elf_paths]
 
+    # step 5: 保存结果
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
     dump_to_json([repo.custom_serialize() for repo in filtered_bin_repos], BIN_REPOS_JSON)
