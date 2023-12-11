@@ -176,6 +176,7 @@ def generate_repositories_json():
                         elf_paths=elf_paths
                     )
                     bin_repos.append(bin_repo)
+
     extension_list = list()
     for bin_repo in bin_repos:
         for elf_path in bin_repo.elf_paths:
