@@ -115,6 +115,16 @@ def find_c_and_cpp_files(args):
     return repo_id, repo_name, version_id, version_number, version_path, target_file_paths
 
 
+def update_repo_elf_files(repo: Repository):
+    """
+    筛选elf
+    :param repo:
+    :return:
+    """
+    repo.elf_paths = [path for path in repo.elf_paths if is_elf_file(path)]
+    return repo
+
+
 def generate_repositories_json():
     logger.info(f"get_version_dir_paths")
     results = get_useful_version_dir_paths()
@@ -131,7 +141,7 @@ def generate_repositories_json():
     for repo_id, repo_name, version_id, version_number, version_path, target_file_paths in tqdm(results,
                                                                                                 total=len(results),
                                                                                                 desc="generate_repositories_json"):
-        # 没有c/cpp 源码，过滤
+        # 没有c/cpp 源码，过滤掉
         if len(target_file_paths) == 0:
             continue
 
@@ -170,8 +180,6 @@ def generate_repositories_json():
                             file_path = os.path.join(root, file_name)
                             if is_filter_file(file_path):
                                 continue
-                            # if is_elf_file(file_path):
-                            #     elf_paths.append(file_path)
                             elf_paths.append(file_path)
                     bin_repo = Repository(
                         repo_path=arch_path,
@@ -189,20 +197,21 @@ def generate_repositories_json():
                     )
                     bin_repos.append(bin_repo)
 
-    extension_list = list()
-    count = 0
-    for bin_repo in bin_repos:
-        count += len(bin_repo.elf_paths)
-        for elf_path in bin_repo.elf_paths:
-            dir_name, elf_name = os.path.split(elf_path)
-            pure_name, extension = os.path.splitext(elf_name)
-            extension_list.append(extension)
-    counter = collections.Counter(extension_list)
-    logger.info(counter.most_common(100))
+    # 多进程筛选elf文件
+    pool_size = multiprocessing.cpu_count()
+    with Pool(pool_size) as pool:
+        # 使用 pool.map 异步处理每个 repository
+        bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
+                              total=len(results),
+                              desc="filter elf files"))
+
+    # 过滤掉没有elf文件的二进制库
+    logger.info(f"filter bin_repos")
+    bin_repos = [repo for repo in bin_repos if repo.elf_paths]
 
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
     dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
-    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}, all_files: {count}")
+    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}")
     logger.info(f"all finished.")
     return src_repos, bin_repos
