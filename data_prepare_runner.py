@@ -17,16 +17,16 @@ if __name__ == '__main__':
     """
     # step 1: 获取tar 文件路径
     logger.info("step 1: 获取tar 文件路径")
-    src_tar_paths, bin_tar_paths = get_tar_file_paths()
+    # src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
     # step x: 筛选掉不常用架构和非c/cpp语言的包
     logger.info("step x: 筛选bin 路径")
-    src_tar_paths, bin_tar_paths = filter_bin_tar_paths(src_tar_paths, bin_tar_paths)
+    # src_tar_paths, bin_tar_paths = filter_bin_tar_paths(src_tar_paths, bin_tar_paths)
     # 大概的数量：src_tar_paths: 71k, bin_tar_paths:310k
 
     # step 2: 解压
     logger.info("step 2: 解压")
-    multiple_decompress(src_tar_paths, bin_tar_paths)
+    # multiple_decompress(src_tar_paths, bin_tar_paths)
 
     # step 3: 生成源码和二进制文件路径
     logger.info("step 3: 生成源码和二进制文件路径")

@@ -23,7 +23,7 @@ def generate_repositories_json():
     version_id = 0
     release_id = 0
     arch_id = 0
-    with tqdm(total=240000, desc="generate_repositories_json") as pbar:
+    with tqdm(total=70000, desc="generate_repositories_json") as pbar:
         for category_name in os.listdir(DECOMPRESSED_DEBIAN_FILE_DIR_PATH):
             category_path = os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category_name)
             if not os.path.isdir(category_path):
