@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import collections
+import json
 import multiprocessing
 import os
 from multiprocessing.dummy import Pool
@@ -203,21 +204,32 @@ def generate_repositories_json():
                     bin_repos.append(bin_repo)
 
     # step 3: 多进程筛选bin repo 的 elf文件
-    pool_size = multiprocessing.cpu_count()
-    with Pool(pool_size) as pool:
-        # 使用 pool.map 异步处理每个 repository
-        bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
-                              total=len(bin_repos),
-                              desc="step 3: filter elf files"))
+    # pool_size = multiprocessing.cpu_count()
+    # with Pool(pool_size) as pool:
+    #     # 使用 pool.map 异步处理每个 repository
+    #     bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
+    #                           total=len(bin_repos),
+    #                           desc="step 3: filter elf files"))
+    extension_dict = dict()
+    for repo in bin_repos:
+        for path in repo.elf_paths:
+            dir_name, file_name = os.path.split(path)
+            pure_name, extension = os.path.splitext(file_name)
+            if extension not in extension_dict:
+                extension_dict[extension] = 1
+            else:
+                extension_dict[extension] += 1
+    with open('extension_dict.json', 'w') as f:
+        json.dump(extension_dict, f, ensure_ascii=False, indent=4)
 
     # step 4: 过滤掉没有elf文件的二进制库
     logger.info(f"step 4: filter bin_repos")
-    filtered_bin_repos = [repo for repo in bin_repos if repo.elf_paths]
+    bin_repos = [repo for repo in bin_repos if repo.elf_paths]
 
     # step 5: 保存结果
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
-    dump_to_json([repo.custom_serialize() for repo in filtered_bin_repos], BIN_REPOS_JSON)
-    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(filtered_bin_repos)}")
+    dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
+    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}")
     logger.info(f"all finished.")
-    return src_repos, filtered_bin_repos
+    return src_repos, bin_repos
