@@ -34,6 +34,13 @@ def is_filter_repo(repo_name):
     return False
 
 
+NOT_ELF_EXTENSION_SET = {'.gz', '.txt', '.Debian', '.cnf', '.h', '.png', '.html', '.hpp', '.py', '.hxx', '.xml',
+                         '.json',
+                         '.js', '.yml', '.cert', '.cmake', '.c', '.php', '.svg', '.lua', '.jpg', '.conf', '.gif', '.go',
+                         '.cpp', '.dat',
+                         '.sh', '.md', '.hh', '.stderr', '.TXT', '.css', '.xhtml', '.cert'}
+
+
 def is_filter_file(elf_path):
     """
     过滤掉不是elf的文件，加速elf筛选
@@ -47,8 +54,7 @@ def is_filter_file(elf_path):
     """
     dir_name, elf_name = os.path.split(elf_path)
     pure_name, extension = os.path.splitext(elf_name)
-    if extension in {'.gz', '.txt', '.Debian', '.cnf', '.h', '.png', '.html', '.hpp', '.py', '.hxx', '.xml', '.json',
-                     '.js'}:
+    if extension in NOT_ELF_EXTENSION_SET:
         return True
 
     return False
@@ -184,7 +190,9 @@ def generate_repositories_json():
                     bin_repos.append(bin_repo)
 
     extension_list = list()
+    count = 0
     for bin_repo in bin_repos:
+        count += len(bin_repo.elf_paths)
         for elf_path in bin_repo.elf_paths:
             dir_name, elf_name = os.path.split(elf_path)
             pure_name, extension = os.path.splitext(elf_name)
@@ -195,6 +203,6 @@ def generate_repositories_json():
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
     dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
-    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}")
+    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}, all_files: {count}")
     logger.info(f"all finished.")
     return src_repos, bin_repos
