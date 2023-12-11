@@ -189,5 +189,6 @@ def generate_repositories_json():
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
     dump_to_json([repo.custom_serialize() for repo in bin_repos], BIN_REPOS_JSON)
+    logger.info(f"src_repos: {len(src_repos)}, bin_repos: {len(bin_repos)}")
     logger.info(f"all finished.")
     return src_repos, bin_repos
