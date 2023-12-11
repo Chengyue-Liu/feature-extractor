@@ -34,7 +34,7 @@ def is_filter_repo(repo_name):
 
     return False
 
-
+# 一些不像是ELF的后缀名，先过滤掉，不然文件太多，判断一遍非常耗时。
 NOT_ELF_EXTENSION_SET = {'.gz', '.txt', '.Debian', '.cnf', '.h', '.png', '.html', '.hpp', '.py', '.hxx', '.xml',
                          '.json',
                          '.js', '.yml', '.cert', '.cmake', '.c', '.php', '.svg', '.lua', '.jpg', '.conf', '.gif', '.go',
