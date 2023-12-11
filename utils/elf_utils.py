@@ -19,29 +19,29 @@ while_list = ['.img', ]
 
 
 def is_elf_file(file_path):
-    # try:
-    #     with open(file_path, 'rb') as f:
-    #         # ELF 文件的前四个字节为 b'\x7fELF'
-    #         return f.read(4) == b'\x7fELF'
-    # except IOError:
-    #     return False
-
     try:
-        file_extension = os.path.splitext(os.path.basename(file_path))[-1]
-        if file_extension in while_list:
-            return True
-        if file_extension in black_list:
-            return False
-
-        file_info = subprocess.check_output(["file", file_path], timeout=1).decode("utf-8")
-        # 判断是否包含关键信息
-        if any(specific_file in file_info for specific_file in specific_files):
-            return True
-        else:
-            return False
-    except Exception as e:
-        logger.error(e)
+        with open(file_path, 'rb') as f:
+            # ELF 文件的前四个字节为 b'\x7fELF'
+            return f.read(4) == b'\x7fELF'
+    except IOError:
         return False
+
+    # try:
+    #     file_extension = os.path.splitext(os.path.basename(file_path))[-1]
+    #     if file_extension in while_list:
+    #         return True
+    #     if file_extension in black_list:
+    #         return False
+    #
+    #     file_info = subprocess.check_output(["file", file_path], timeout=1).decode("utf-8")
+    #     # 判断是否包含关键信息
+    #     if any(specific_file in file_info for specific_file in specific_files):
+    #         return True
+    #     else:
+    #         return False
+    # except Exception as e:
+    #     logger.error(e)
+    #     return False
 
 
 def extract_elf_strings(path: str) -> List[str]:
