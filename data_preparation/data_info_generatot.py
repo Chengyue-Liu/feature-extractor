@@ -15,6 +15,18 @@ from utils.json_util import dump_to_json
 # @Time : 2023/12/6 18:25
 # @Author : Liu Chengyue
 
+def repo_filter(repo_name):
+    """
+    虽然在解压之前已经过滤过一次了，但是还是有很多漏网之鱼，这里补充过滤一下。
+
+    :param repo_name:
+    :return:
+    """
+    if repo_name.endswith(("-perl", "-java")):
+        return False
+    return True
+
+
 def get_version_dir_paths():
     repo_id = 0
     version_id = 0
@@ -24,6 +36,8 @@ def get_version_dir_paths():
         if not os.path.isdir(category_path):
             continue
         for repo_name in os.listdir(category_path):
+            if not repo_filter(repo_name):
+                continue
             library_path = os.path.join(category_path, repo_name)
             if not os.path.isdir(library_path):
                 continue

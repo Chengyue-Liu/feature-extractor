@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # step x: 筛选掉不常用架构和非c/cpp语言的包
     logger.info("step x: 筛选bin 路径")
-    # src_tar_paths, bin_tar_paths = filter_bin_tar_paths(src_tar_paths, bin_tar_paths)
+    src_tar_paths, bin_tar_paths = filter_bin_tar_paths(src_tar_paths, bin_tar_paths)
     # 大概的数量：src_tar_paths: 71k, bin_tar_paths:310k
 
     # step 2: 解压
