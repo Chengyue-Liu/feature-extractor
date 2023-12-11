@@ -148,122 +148,122 @@ class RepoFeature:
             )
 
 
-from binaryninja import Function, BasicBlock, BinaryViewType, BinaryView
-
-
-class BasicBlockFeature:
-    """
-    BasicBlock
-    index： 基本块的索引，表示在函数中的顺序位置。
-    start： 基本块的起始地址。
-    end： 基本块的结束地址。
-    length： 基本块的长度（以字节为单位）。
-    incoming_edges： 进入基本块的边。
-    outgoing_edges： 从基本块出去的边。
-    instructions： 基本块中的指令列表。
-    function： 包含该基本块的函数对象。
-    arch： 与基本块相关的体系结构。
-    low_level_il： 低级中间表示（Low Level Intermediate Language）的表示，用于分析和修改基本块的代码。
-    medium_level_il： 中级中间表示（Medium Level Intermediate Language）的表示。
-    high_level_il： 高级中间表示（High Level Intermediate Language）的表示。
-
-
-
-    Edge
-    source： 连接的起始基本块。
-    target： 连接的目标基本块。
-    type： 连接的类型。可以是以下枚举值之一：
-        ControlFlowEdgeType.UnconditionalBranch: 无条件分支。
-        ControlFlowEdgeType.TrueBranch: 条件分支的真分支。
-        ControlFlowEdgeType.FalseBranch: 条件分支的假分支。
-        ControlFlowEdgeType.IndirectBranch: 间接分支。
-        ControlFlowEdgeType.CallEdge: 函数调用。
-    back_edge： 一个布尔值，指示是否是循环中的反向边。
-        branch_type： 如果连接是条件分支，表示分支的类型。可以是以下枚举值之一：
-        BranchType.TrueBranch: 条件分支的真分支。
-        BranchType.FalseBranch: 条件分支的假分支。
-        BranchType.UnconditionalBranch: 无条件分支。
-    """
-
-    def __init__(self, bb: BasicBlock):
-        self.index = int(bb.index)
-        self.outgoing_edges = [(int(edge.source.index), int(edge.target.index)) for edge in bb.outgoing_edges]
-
-        # ACFG Attributes
-        self.length = bb.length
-        self.incoming_edge_num = len(bb.incoming_edges)
-        self.outgoing_edge_num = len(bb.outgoing_edges)
-        self.instruction_num = bb.instruction_count
-
-    def __repr__(self):
-        return f"BasicBlock({self.index}), edge_num: {len(self.outgoing_edges)}"
-
-    def custom_serialize(self):
-        return {
-            "index": self.index,
-            "length": self.length,
-            "incoming_edge_num": self.incoming_edge_num,
-            "outgoing_edge_num": self.outgoing_edge_num,
-            "instruction_num": self.instruction_num,
-            "outgoing_edges": [f"{edge[0]}-{edge[1]}" for edge in self.outgoing_edges],
-        }
-
-
-class FunctionFeature:
-    """
-    Function
-
-        name： 函数的名称。
-        start： 函数的起始地址。
-        end： 函数的结束地址。
-        platform： 函数的平台信息。
-        calling_convention： 函数的调用约定。
-        arch： 与函数相关的体系结构。
-        basic_blocks： 函数包含的基本块列表。
-        parameters： 函数的参数列表。
-        return_type： 函数的返回类型。
-        symbol： 函数的符号信息。
-        analysis_performance_info： 用于性能分析的信息。
-        comment： 函数的注释。
-        analysis_info： 有关函数分析状态的信息。
-        low_level_il： 低级中间表示（Low Level Intermediate Language）的表示，用于分析和修改函数的代码。
-        medium_level_il： 中级中间表示（Medium Level Intermediate Language）的表示。
-        high_level_il： 高级中间表示（High Level Intermediate Language）的表示。
-    """
-
-    def __init__(self, function_name, func: Function):
-        # 函数名称
-        self.function_name = function_name
-
-        # 其他信息
-        self.caller_num = len(func.callers)
-        self.callee_num = len(func.callees)
-        self.parameter_num = len(func.parameter_vars)
-        self.basic_block_num = len(func.basic_blocks)
-        self.edge_num = 0
-
-        # basic blocks
-        self.basic_blocks: List[BasicBlockFeature] = []
-        for bb in func.basic_blocks:
-            self.basic_blocks.append(BasicBlockFeature(bb))
-            self.edge_num += len(bb.outgoing_edges)
-
-    def __repr__(self):
-        return f"{self.function_name}, {self.basic_blocks}"
-
-    def custom_serialize(self):
-        json_data = dict()
-
-        # 如果至少5个边，保存CFG
-        if len(self.basic_blocks) >= EDGE_NUM_THRESHOLD:
-            json_data = {
-                "function_name": self.function_name,
-                "caller_num": self.caller_num,
-                "callee_num": self.callee_num,
-                "parameter_num": self.parameter_num,
-                "basic_block_num": self.basic_block_num,
-                "edge_num": self.edge_num,
-                "basic_blocks": [bbf.custom_serialize() for bbf in self.basic_blocks]
-            }
-
-        return json_data if json_data else None
+# from binaryninja import Function, BasicBlock
+#
+#
+# class BasicBlockFeature:
+#     """
+#     BasicBlock
+#     index： 基本块的索引，表示在函数中的顺序位置。
+#     start： 基本块的起始地址。
+#     end： 基本块的结束地址。
+#     length： 基本块的长度（以字节为单位）。
+#     incoming_edges： 进入基本块的边。
+#     outgoing_edges： 从基本块出去的边。
+#     instructions： 基本块中的指令列表。
+#     function： 包含该基本块的函数对象。
+#     arch： 与基本块相关的体系结构。
+#     low_level_il： 低级中间表示（Low Level Intermediate Language）的表示，用于分析和修改基本块的代码。
+#     medium_level_il： 中级中间表示（Medium Level Intermediate Language）的表示。
+#     high_level_il： 高级中间表示（High Level Intermediate Language）的表示。
+#
+#
+#
+#     Edge
+#     source： 连接的起始基本块。
+#     target： 连接的目标基本块。
+#     type： 连接的类型。可以是以下枚举值之一：
+#         ControlFlowEdgeType.UnconditionalBranch: 无条件分支。
+#         ControlFlowEdgeType.TrueBranch: 条件分支的真分支。
+#         ControlFlowEdgeType.FalseBranch: 条件分支的假分支。
+#         ControlFlowEdgeType.IndirectBranch: 间接分支。
+#         ControlFlowEdgeType.CallEdge: 函数调用。
+#     back_edge： 一个布尔值，指示是否是循环中的反向边。
+#         branch_type： 如果连接是条件分支，表示分支的类型。可以是以下枚举值之一：
+#         BranchType.TrueBranch: 条件分支的真分支。
+#         BranchType.FalseBranch: 条件分支的假分支。
+#         BranchType.UnconditionalBranch: 无条件分支。
+#     """
+#
+#     def __init__(self, bb: BasicBlock):
+#         self.index = int(bb.index)
+#         self.outgoing_edges = [(int(edge.source.index), int(edge.target.index)) for edge in bb.outgoing_edges]
+#
+#         # ACFG Attributes
+#         self.length = bb.length
+#         self.incoming_edge_num = len(bb.incoming_edges)
+#         self.outgoing_edge_num = len(bb.outgoing_edges)
+#         self.instruction_num = bb.instruction_count
+#
+#     def __repr__(self):
+#         return f"BasicBlock({self.index}), edge_num: {len(self.outgoing_edges)}"
+#
+#     def custom_serialize(self):
+#         return {
+#             "index": self.index,
+#             "length": self.length,
+#             "incoming_edge_num": self.incoming_edge_num,
+#             "outgoing_edge_num": self.outgoing_edge_num,
+#             "instruction_num": self.instruction_num,
+#             "outgoing_edges": [f"{edge[0]}-{edge[1]}" for edge in self.outgoing_edges],
+#         }
+#
+#
+# class FunctionFeature:
+#     """
+#     Function
+#
+#         name： 函数的名称。
+#         start： 函数的起始地址。
+#         end： 函数的结束地址。
+#         platform： 函数的平台信息。
+#         calling_convention： 函数的调用约定。
+#         arch： 与函数相关的体系结构。
+#         basic_blocks： 函数包含的基本块列表。
+#         parameters： 函数的参数列表。
+#         return_type： 函数的返回类型。
+#         symbol： 函数的符号信息。
+#         analysis_performance_info： 用于性能分析的信息。
+#         comment： 函数的注释。
+#         analysis_info： 有关函数分析状态的信息。
+#         low_level_il： 低级中间表示（Low Level Intermediate Language）的表示，用于分析和修改函数的代码。
+#         medium_level_il： 中级中间表示（Medium Level Intermediate Language）的表示。
+#         high_level_il： 高级中间表示（High Level Intermediate Language）的表示。
+#     """
+#
+#     def __init__(self, function_name, func: Function):
+#         # 函数名称
+#         self.function_name = function_name
+#
+#         # 其他信息
+#         self.caller_num = len(func.callers)
+#         self.callee_num = len(func.callees)
+#         self.parameter_num = len(func.parameter_vars)
+#         self.basic_block_num = len(func.basic_blocks)
+#         self.edge_num = 0
+#
+#         # basic blocks
+#         self.basic_blocks: List[BasicBlockFeature] = []
+#         for bb in func.basic_blocks:
+#             self.basic_blocks.append(BasicBlockFeature(bb))
+#             self.edge_num += len(bb.outgoing_edges)
+#
+#     def __repr__(self):
+#         return f"{self.function_name}, {self.basic_blocks}"
+#
+#     def custom_serialize(self):
+#         json_data = dict()
+#
+#         # 如果至少5个边，保存CFG
+#         if len(self.basic_blocks) >= EDGE_NUM_THRESHOLD:
+#             json_data = {
+#                 "function_name": self.function_name,
+#                 "caller_num": self.caller_num,
+#                 "callee_num": self.callee_num,
+#                 "parameter_num": self.parameter_num,
+#                 "basic_block_num": self.basic_block_num,
+#                 "edge_num": self.edge_num,
+#                 "basic_blocks": [bbf.custom_serialize() for bbf in self.basic_blocks]
+#             }
+#
+#         return json_data if json_data else None
