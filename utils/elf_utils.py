@@ -36,7 +36,6 @@ def is_elf_file(file_path):
         file_info = subprocess.check_output(["file", file_path], timeout=1).decode("utf-8")
         # 判断是否包含关键信息
         if any(specific_file in file_info for specific_file in specific_files):
-            logger.debug(f'file_info: {file_path}: {file_info}')
             return True
         else:
             return False
