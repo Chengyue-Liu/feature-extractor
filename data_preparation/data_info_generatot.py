@@ -35,6 +35,7 @@ def get_version_dir_paths():
     repo_id = 0
     version_id = 0
     results = []
+    start_count = dict()
     for category_name in os.listdir(DECOMPRESSED_DEBIAN_FILE_DIR_PATH):
         category_path = os.path.join(DECOMPRESSED_DEBIAN_FILE_DIR_PATH, category_name)
         if not os.path.isdir(category_path):
@@ -45,6 +46,12 @@ def get_version_dir_paths():
             library_path = os.path.join(category_path, repo_name)
             if not os.path.isdir(library_path):
                 continue
+            if "-" in repo_name:
+                repo_name_start = repo_name.split("-")[0]
+                if repo_name_start not in start_count:
+                    start_count[repo_name_start] = 1
+                else:
+                    start_count[repo_name_start] += 1
             repo_id += 1
             for version_number in os.listdir(library_path):
                 version_path = os.path.join(library_path, version_number)
@@ -54,6 +61,8 @@ def get_version_dir_paths():
                 if version_id % 1000 == 0:
                     logger.info(f"get_version_dir_paths progres: {version_id}")
                 results.append((repo_id, repo_name, version_id, version_number, version_path))
+    start_count = {k:start_count[k] for k in sorted(start_count,key=lambda x:start_count[x])}
+    print(start_count)
     return results
 
 
