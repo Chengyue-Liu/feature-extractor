@@ -126,14 +126,16 @@ def update_repo_elf_files(repo: Repository):
 
 
 def generate_repositories_json():
-    logger.info(f"get_version_dir_paths")
+    # step 1: 找到版本文件夹
+    logger.info(f"step 0: get_version_dir_paths")
     results = get_useful_version_dir_paths()
-    pool_size = multiprocessing.cpu_count()
+
     # step 1: 多进程筛选源码c/cpp文件
+    pool_size = multiprocessing.cpu_count()
     with Pool(pool_size) as pool:
         # 使用 pool.map 异步处理每个 repository
         results = list(tqdm(pool.imap_unordered(find_c_and_cpp_files, results), total=len(results),
-                            desc="find c files"))
+                            desc="step 1: find c files"))
 
     # step 2: 初始化 src_repo, bin_repo
     src_repos = []
@@ -142,7 +144,7 @@ def generate_repositories_json():
     arch_id = 0
     for repo_id, repo_name, version_id, version_number, version_path, target_file_paths in tqdm(results,
                                                                                                 total=len(results),
-                                                                                                desc="generate_repositories_json"):
+                                                                                                desc="step 2: generate_repositories_json"):
         # 没有c/cpp 源码，过滤掉
         if len(target_file_paths) == 0:
             continue
@@ -206,10 +208,10 @@ def generate_repositories_json():
         # 使用 pool.map 异步处理每个 repository
         bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
                               total=len(bin_repos),
-                              desc="filter elf files"))
+                              desc="step 3: filter elf files"))
 
     # step 4: 过滤掉没有elf文件的二进制库
-    logger.info(f"filter bin_repos")
+    logger.info(f"step 4: filter bin_repos")
     filtered_bin_repos = [repo for repo in bin_repos if repo.elf_paths]
 
     # step 5: 保存结果
