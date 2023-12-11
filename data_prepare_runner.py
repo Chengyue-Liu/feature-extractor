@@ -28,9 +28,10 @@ if __name__ == '__main__':
     logger.info("step 2: 解压")
     # multiple_decompress(src_tar_paths, bin_tar_paths)
 
-    # step 3: 生成源码和二进制文件路径
+    # step 3: 生成源码和二进制文件路径[这个过程中有后续补充的筛选逻辑]
     logger.info("step 3: 生成源码和二进制文件路径")
     generate_repositories_json()
+    # 大概的数量：src_repo: , bin_repo:
 
     # step 4: 简要统计
     logger.info("step 4: 简要统计")

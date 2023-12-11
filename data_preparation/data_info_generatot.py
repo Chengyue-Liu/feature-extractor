@@ -37,12 +37,18 @@ def is_filter_repo(repo_name):
 def is_filter_file(elf_path):
     """
     过滤掉不是elf的文件，加速elf筛选
+
+     [('.h', 1953766), ('', 1427686), ('.png', 1278914), ('.html', 1105294), ('.mo', 585211), ('.hpp', 511953),
+     ('.py', 504704), ('.ko', 386544), ('.so', 300430), ('.svg', 272701), ('.hxx', 177003), ('.xml', 161375),
+     ('.page', 152596), ('.o', 136618), ('.tfm', 115544), ('.json', 112022), ('.js', 107594), ('.rs', 85749),
+      ('.a', 75816), ('.m', 74802)]
     :param elf_path:
     :return:
     """
     dir_name, elf_name = os.path.split(elf_path)
     pure_name, extension = os.path.splitext(elf_name)
-    if extension in {'.gz', '.txt', '.Debian','.cnf'}:
+    if extension in {'.gz', '.txt', '.Debian', '.cnf', '.h', '.png', '.html', '.hpp', '.py', '.hxx', '.xml', '.json',
+                     '.js'}:
         return True
 
     return False
@@ -184,7 +190,7 @@ def generate_repositories_json():
             pure_name, extension = os.path.splitext(elf_name)
             extension_list.append(extension)
     counter = collections.Counter(extension_list)
-    logger.info(counter.most_common(20))
+    logger.info(counter.most_common(100))
 
     logger.info(f"saving json ...")
     dump_to_json([repo.custom_serialize() for repo in src_repos], SRC_REPOS_JSON)
