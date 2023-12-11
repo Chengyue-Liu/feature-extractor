@@ -450,12 +450,12 @@ def generate_repositories_json():
                     bin_repos.append(bin_repo)
 
     # step 3: 多进程筛选bin repo 的 elf文件
-    # pool_size = multiprocessing.cpu_count()
-    # with Pool(pool_size) as pool:
-    #     # 使用 pool.map 异步处理每个 repository
-    #     bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
-    #                           total=len(bin_repos),
-    #                           desc="step 3: filter elf files"))
+    pool_size = multiprocessing.cpu_count()
+    with Pool(pool_size) as pool:
+        # 使用 pool.map 异步处理每个 repository
+        bin_repos = list(tqdm(pool.imap_unordered(update_repo_elf_files, bin_repos),
+                              total=len(bin_repos),
+                              desc="step 3: filter elf files"))
 
     # step x: extension_dict
     logger.info(f"extension_dict")
