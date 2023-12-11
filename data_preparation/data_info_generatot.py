@@ -62,7 +62,7 @@ def get_version_dir_paths():
                     logger.info(f"get_version_dir_paths progres: {version_id}")
                 results.append((repo_id, repo_name, version_id, version_number, version_path))
     start_count = {k:start_count[k] for k in sorted(start_count,key=lambda x:start_count[x])}
-    print(start_count)
+    logger.info(start_count)
     return results
 
 
