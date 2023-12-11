@@ -25,7 +25,7 @@ def is_filter_repo(repo_name):
     if repo_name.endswith(("-perl", "-java")):
         return True
 
-    if repo_name.startswith(("python-", "php-")):
+    if repo_name.startswith(("python-", "php-","golang-")):
         return True
 
     return False
