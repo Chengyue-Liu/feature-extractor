@@ -34,7 +34,7 @@ def ninja_binary(path):
             fcg_dict[func.name].add(callee.name)
 
         # 函数名称
-        if not(func.name.startswith("sub_") and len(func.name) == 9):
+        if func.name.startswith("sub_"):
             function_name = None
         else:
             function_name = func.name
