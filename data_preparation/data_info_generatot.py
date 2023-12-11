@@ -35,6 +35,11 @@ def is_filter_repo(repo_name):
 
 
 def is_filter_file(elf_path):
+    """
+    过滤掉不是elf的文件，加速elf筛选
+    :param elf_path:
+    :return:
+    """
     dir_name, elf_name = os.path.split(elf_path)
     pure_name, extension = os.path.splitext(elf_name)
     if extension in {'.gz', '.txt', '.Debian','.cnf'}:
@@ -43,7 +48,7 @@ def is_filter_file(elf_path):
     return False
 
 
-def get_version_dir_paths():
+def get_useful_version_dir_paths():
     repo_id = 0
     version_id = 0
     results = []
@@ -80,7 +85,7 @@ def get_version_dir_paths():
     return results
 
 
-def process_repository(args):
+def find_c_and_cpp_files(args):
     """
     找出所有的c/cpp文件
     :param args:
@@ -100,11 +105,11 @@ def process_repository(args):
 
 def generate_repositories_json():
     logger.info(f"get_version_dir_paths")
-    results = get_version_dir_paths()
-    pool_size = multiprocessing.cpu_count()
+    results = get_useful_version_dir_paths()
+    pool_size = 20
     with Pool(pool_size) as pool:
         # 使用 pool.map 异步处理每个 repository
-        results = list(tqdm(pool.imap_unordered(process_repository, results), total=len(results),
+        results = list(tqdm(pool.imap_unordered(find_c_and_cpp_files, results), total=len(results),
                             desc="find c files"))
 
     src_repos = []
