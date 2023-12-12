@@ -19,7 +19,7 @@ if __name__ == '__main__':
     logger.info("step 1: 获取tar 文件路径")
     # src_tar_paths, bin_tar_paths = get_tar_file_paths()
 
-    # step x: 筛选掉不常用架构和非c/cpp语言的包
+    # step x: 初步筛选掉非arm/amd64, 非c/cpp语言的包
     logger.info("step x: 筛选bin 路径")
     # src_tar_paths, bin_tar_paths = filter_bin_tar_paths(src_tar_paths, bin_tar_paths)
     # 大概的数量：src_tar_paths: 71k, bin_tar_paths:310k
@@ -32,6 +32,10 @@ if __name__ == '__main__':
     logger.info("step 3: 生成源码和二进制文件路径")
     generate_repositories_json()
     # 大概的数量：src_repo:54k , bin_repo: 180k
+    # 再次筛选条件：src 有c/cpp, bin 有二进制，且源码二进制都存在。
+    # src repo: 13523
+    # src repo version: 27294
+    # bin package: 128051
 
     # step 4: 简要统计
     logger.info("step 4: 简要统计")
@@ -40,6 +44,10 @@ if __name__ == '__main__':
     # step 5: 筛选测试用例ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
     logger.info("step 5: 筛选测试用例")
     generate_tc_information()
+    # 测试用例数量：
+    # tc repo num: 12575
+    # tc repo version num: 14460
+    # tc file num: 68878
 
     logger.info(f"all finished.")
     """
