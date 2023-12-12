@@ -35,6 +35,9 @@ def main():
 
     logger.info("all done.")
 
+    """
+    nohup python feature_extraction_runner.py &
+    """
 
 if __name__ == '__main__':
     main()
