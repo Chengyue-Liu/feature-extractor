@@ -18,20 +18,20 @@ from settings import BIN_REPOS_JSON, SRC_REPOS_JSON
 
 def main():
     # 提取特征
-    logger.info(f"提取二进制普通特征")
-    bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
-    extractor = BinStringExtractor(bin_repos)
-    extractor.multiple_run()
+    # logger.info(f"提取二进制普通特征")
+    # bin_repos = Repository.init_repositories_from_json_file(BIN_REPOS_JSON)
+    # extractor = BinStringExtractor(bin_repos)
+    # extractor.multiple_run()
 
-    logger.info(f"提取二进制CFG等特征")
+    # logger.info(f"提取二进制CFG等特征")
     # extractor = BinFunctionExtractor(bin_repos)
     # extractor.multiple_run()
 
     # 源码字符串
     logger.info(f"提取源码特征")
-    # src_repos = Repository.init_repositories_from_json_file(SRC_REPOS_JSON)
-    # extractor = SrcFeatureTreeSitterExtractor(src_repos)
-    # extractor.multiple_run()
+    src_repos = Repository.init_repositories_from_json_file(SRC_REPOS_JSON)
+    extractor = SrcFeatureTreeSitterExtractor(src_repos)
+    extractor.multiple_run()
 
     logger.info("all done.")
 

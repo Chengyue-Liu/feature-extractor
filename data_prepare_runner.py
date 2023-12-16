@@ -46,7 +46,7 @@ if __name__ == '__main__':
     generate_tc_information()
     # 测试用例数量：
     # tc repo num: 12575
-    # tc repo version num: 14460
+    # tc repo version num: 144600
     # tc file num: 68878
 
     logger.info(f"all finished.")

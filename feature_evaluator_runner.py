@@ -31,6 +31,7 @@ def main():
     # ps aux | grep "python feature_evaluator_runner.py" | grep -v grep | awk '{print $2}' | xargs kill
 
 
+    # 100, 1000, 10000
 
 if __name__ == '__main__':
     main()
