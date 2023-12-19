@@ -9,7 +9,7 @@ from tqdm import tqdm
 from feature_evaluation.entities import BinStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
-from settings import BIN_STRING_SCA_THRESHOLD
+from settings import BIN_STRING_SCA_THRESHOLD, TEST_CASES_JSON_PATH
 from utils.elf_utils import extract_elf_strings
 
 
@@ -98,7 +98,7 @@ class BinStringEvaluator(FeatureEvaluator):
         logger.critical(f"收录的库数量：{len(self.bin_string_feature_dict)}, "
                         f"{len(self.repo_features)}(区分release, arch), "
                         f"字符串数量: {len(self.string_repo_dict)}")
-        logger.critical(f"测试用例情况:{test_case_count}, testcase file num:{test_case_file_count}")
+        logger.critical(f"测试用例:{TEST_CASES_JSON_PATH}, 文件数量：{test_case_file_count}")
         logger.critical(f"测试阈值: {threshold}")
         logger.critical(f"检测结果：")
 

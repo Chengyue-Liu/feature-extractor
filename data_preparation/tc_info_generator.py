@@ -26,24 +26,25 @@ def generate_tc_information():
     # 加载二进制信息
     bin_repo_test_cases_dict = load_bin_repo_info(src_repo_ids, tc_summary)
 
-    # 版本过滤【只保留最新，最旧和中间的一个版本】
-    tc_10000, tc_1000, tc_100 = filter_test_cases(bin_repo_test_cases_dict)
+    # 随机选择测试用例，并保存到文件
+    filter_and_dump_test_cases(bin_repo_test_cases_dict)
 
+
+def filter_and_dump_test_cases(bin_repo_test_cases_dict):
+    # 10000个
+    tc_repo_files_10000 = generate_tc_repo_files(bin_repo_test_cases_dict, 4)
     with open(TEST_CASES_10000_JSON_PATH, 'w') as f:
-        json.dump(tc_10000, f, ensure_ascii=False)
+        json.dump(tc_repo_files_10000, f, ensure_ascii=False)
 
+    # 1000个
+    tc_repo_files_1000 = generate_tc_repo_files(bin_repo_test_cases_dict, 4)
     with open(TEST_CASES_1000_JSON_PATH, 'w') as f:
-        json.dump(tc_1000, f, ensure_ascii=False)
+        json.dump(tc_repo_files_1000, f, ensure_ascii=False)
+
+    # 100个
+    tc_repo_files_100 = generate_tc_repo_files(bin_repo_test_cases_dict, 4)
     with open(TEST_CASES_100_JSON_PATH, 'w') as f:
-        json.dump(tc_100, f, ensure_ascii=False)
-
-
-def filter_test_cases(bin_repo_test_cases_dict):
-    tc_repo_files_10000 = generate_tc_repo_files(bin_repo_test_cases_dict, 10000)
-    tc_repo_files_1000 = generate_tc_repo_files(bin_repo_test_cases_dict, 1000)
-    tc_repo_files_100 = generate_tc_repo_files(bin_repo_test_cases_dict, 100)
-
-    return tc_repo_files_10000, tc_repo_files_1000, tc_repo_files_100
+        json.dump(tc_repo_files_100, f, ensure_ascii=False)
 
 
 def generate_tc_repo_files(bin_repo_test_cases_dict, sample_size=10000):
