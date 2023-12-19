@@ -19,16 +19,18 @@ def main():
     logger.info(f"init testcases")
     test_cases = TestCase.get_test_cases()
 
-    # bin string
-    # evaluator = BinStringEvaluator()
-    # evaluator.evaluate(test_cases)
+
 
     # src string
-    # evaluator = SrcStringEvaluator()
-    # evaluator.evaluate(test_cases)
-    #
-    # # src function name
+    evaluator = SrcStringEvaluator()
+    evaluator.evaluate(test_cases)
+
+    # src function name
     evaluator = SrcFunctionNameEvaluator()
+    evaluator.evaluate(test_cases)
+
+    # bin string
+    evaluator = BinStringEvaluator()
     evaluator.evaluate(test_cases)
 
     # 常用命令
