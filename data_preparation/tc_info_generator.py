@@ -22,7 +22,7 @@ def generate_tc_information():
     # 加载二进制信息
     bin_repo_test_cases_dict = load_bin_repo_info(src_repo_ids, tc_summary)
 
-    # 筛选
+    # 版本过滤【只保留最新，最旧和中间的一个版本】
     filter_test_cases(bin_repo_test_cases_dict, tc_summary)
 
     # 保存
@@ -62,8 +62,9 @@ def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
             filtered_elf_file_num += len(test_case["elf_paths"])
     logger.info(
         f"TEST_CASE_SAMPLE_SIZE_PER_REPO: {TEST_CASE_SAMPLE_SIZE_PER_REPO}\n"
-        f"filtered_test_cases_num: {filtered_bin_repo_num}\n"
-        f"filtered_elf_file_num: {filtered_elf_file_num}\n")
+        f"filtered_tc_repo_num: {len(bin_repo_test_cases_dict)}\n"
+        f"filtered_tc_repo_version_num: {filtered_bin_repo_num}\n"
+        f"filtered_tc_elf_file_num: {filtered_elf_file_num}\n")
 
     tc_summary["TEST_CASE_SAMPLE_SIZE_PER_REPO"] = TEST_CASE_SAMPLE_SIZE_PER_REPO
     tc_summary["filtered_bin_repo_num"] = filtered_bin_repo_num
@@ -113,7 +114,7 @@ def load_src_repo_info(tc_summary):
             version_id = src_repo["version_id"]
             version_key = f"{repo_id}-{version_id}"
             src_repo_version_ids.add(version_key)
-    logger.info(f"all_src_repo_num: {all_src_repo_num}\n"
+    logger.info(f"src_repo_num: {all_src_repo_num}\n"
                 f"src repo with target file num: {len(src_repo_ids)}\n"
                 f"src repo version with target file num: {len(src_repo_version_ids)}\n")
     tc_summary["all_src_repo_num"] = all_src_repo_num

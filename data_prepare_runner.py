@@ -46,6 +46,9 @@ if __name__ == '__main__':
     # step 5: 筛选测试用例ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
     logger.info("step 5: 筛选测试用例")
     generate_tc_information()
+    # 测试用例数量
+    # filtered_test_cases_num: 14460
+    # filtered_elf_file_num: 63392
 
 
     logger.info(f"all finished.")
