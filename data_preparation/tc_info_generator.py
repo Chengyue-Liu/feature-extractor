@@ -46,6 +46,16 @@ def filter_test_cases(bin_repo_test_cases_dict):
     tc_10000_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 10000)
     tc_10000_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_10000_repo_ids]
 
+    def count_elf_num(repos):
+        count = 0
+        for repo in repos:
+            count += len(repo["elf_paths"])
+        logger.info(f"elf_num: {count}")
+
+    count_elf_num(tc_100_repos)
+    count_elf_num(tc_1000_repos)
+    count_elf_num(tc_10000_repos)
+
     return tc_100_repos, tc_1000_repos, tc_10000_repos
 
 
