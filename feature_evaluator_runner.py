@@ -20,16 +20,16 @@ def main():
     test_cases = TestCase.get_test_cases()
 
     # bin string
-    evaluator = BinStringEvaluator()
-    evaluator.evaluate(test_cases)
+    # evaluator = BinStringEvaluator()
+    # evaluator.evaluate(test_cases)
 
     # src string
     # evaluator = SrcStringEvaluator()
-    # evaluator.evaluate()
+    # evaluator.evaluate(test_cases)
     #
     # # src function name
-    # evaluator = SrcFunctionNameEvaluator()
-    # evaluator.evaluate()
+    evaluator = SrcFunctionNameEvaluator()
+    evaluator.evaluate(test_cases)
 
     # 常用命令
     # nohup python feature_evaluator_runner.py &

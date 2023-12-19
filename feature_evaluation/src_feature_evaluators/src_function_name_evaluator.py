@@ -62,7 +62,7 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited...")
 
-    def evaluate(self):
+    def evaluate(self,test_cases):
         # 分布统计
         repo_function_name_nums = [len(repo_feature.function_names) for repo_feature in
                                    self.src_function_name_feature_dict.values()]
@@ -74,14 +74,9 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
                             , sample_name="src_function_name", feature_name="src_repo")
 
         # sca 效果评估
-        self.sca_evaluate(SRC_FUNCTION_NAME_SCA_THRESHOLD)
+        self.sca_evaluate(test_cases,SRC_FUNCTION_NAME_SCA_THRESHOLD)
 
-    def sca(self, file_path):
-        # 文件名称
-        file_name = os.path.split(file_path)[-1]
-
-        # 提取二进制字符串
-        strings = extract_elf_strings(file_path)
+    def sca(self, strings):
 
         # 根据字符串查询对应的library_id, version_id
         string_repo_id_version_id_tuple_list = []
