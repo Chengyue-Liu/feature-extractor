@@ -68,6 +68,7 @@ def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
 
     tc_summary["TEST_CASE_SAMPLE_SIZE_PER_REPO"] = TEST_CASE_SAMPLE_SIZE_PER_REPO
     tc_summary["filtered_bin_repo_num"] = filtered_bin_repo_num
+    tc_summary["filtered_tc_repo_version_num"] = filtered_tc_repo_version_num
     tc_summary["filtered_elf_file_num"] = filtered_elf_file_num
 
 
