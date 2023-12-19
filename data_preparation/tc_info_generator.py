@@ -6,7 +6,7 @@ import random
 
 from loguru import logger
 
-from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, TEST_CASES_JSON_PATH, \
+from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, \
     TC_BIN_REPOS_JSON, TEST_CASES_100_JSON_PATH, TEST_CASES_1000_JSON_PATH, TEST_CASES_10000_JSON_PATH
 
 

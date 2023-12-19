@@ -52,6 +52,7 @@ class TestCase:
 
         :return:
         """
+        
         if os.path.exists(TEST_CASES_JSON_PATH):
             test_cases = cls.init_from_test_cases_json_file(TEST_CASES_JSON_PATH)
         else:
