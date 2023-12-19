@@ -83,11 +83,13 @@ def load_bin_repo_info(src_repo_ids, tc_summary):
                 continue
             repo_id_set.add(repo_id)
             bin_repo_test_cases_dict[repo_id].append(bin_repo)
-    logger.info(f"\nbin_repo_num: {len(repo_id_set)}\n"
-                f"different_bin_repo_num: {len(bin_repos)}\n")
+    bin_repo_num = len(repo_id_set)
+    different_bin_repo_num = len(bin_repos)
+    logger.info(f"\nbin_repo_num: {bin_repo_num}\n"
+                f"different_bin_repo_num: {different_bin_repo_num}\n")
 
-    tc_summary["bin_repo_num"] = len(repo_id_set)
-    tc_summary["different_bin_repo_num"] = len(bin_repos)
+    tc_summary["bin_repo_num"] = bin_repo_num
+    tc_summary["different_bin_repo_num"] = different_bin_repo_num
     return bin_repo_test_cases_dict
 
 
@@ -107,7 +109,7 @@ def load_src_repo_info(tc_summary):
     src_repo_num = len(src_repo_ids)
     src_repo_version_num = len(src_repo_version_ids)
     logger.info(f"\nsrc_repo_num: {src_repo_num}\n"
-                f"src_repo_version_ids: {src_repo_version_ids}\n")
+                f"src_repo_version_ids: {src_repo_version_num}\n")
 
     tc_summary["src_repo_num"] = src_repo_num
     tc_summary["src_repo_version_num"] = src_repo_version_num
