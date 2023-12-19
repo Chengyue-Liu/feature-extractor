@@ -47,8 +47,9 @@ if __name__ == '__main__':
     logger.info("step 5: 筛选测试用例")
     generate_tc_information()
     # 测试用例数量
-    # filtered_test_cases_num: 14460
-    # filtered_elf_file_num: 63392
+    # filtered_tc_repo_num: 12575 : 有二进制，有源码的库
+    # filtered_test_cases_num: 14460 ： 二进制包数量
+    # filtered_elf_file_num: 61914 ： elf文件数量
 
 
     logger.info(f"all finished.")
