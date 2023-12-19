@@ -103,9 +103,12 @@ def load_src_repo_info(tc_summary):
             version_id = src_repo["version_id"]
             version_key = f"{repo_id}-{version_id}"
             src_repo_version_ids.add(version_key)
-    logger.info(f"\nsrc_repo_num: {all_src_repo_num}\n"
-                f"src repo with target file num: {len(src_repo_ids)}\n")
 
-    tc_summary["all_src_repo_num"] = all_src_repo_num
-    tc_summary["src_repo_with_target_file_num"] = len(src_repo_ids)
+    src_repo_num = len(src_repo_ids)
+    src_repo_version_num = len(src_repo_version_ids)
+    logger.info(f"\nsrc_repo_num: {src_repo_num}\n"
+                f"src_repo_version_ids: {src_repo_version_ids}\n")
+
+    tc_summary["src_repo_num"] = src_repo_num
+    tc_summary["src_repo_version_num"] = src_repo_version_num
     return src_repo_ids
