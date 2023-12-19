@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 import collections
 import json
+import multiprocessing
 import random
+from multiprocessing import Pool
 
 from loguru import logger
+from tqdm import tqdm
 
 from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, \
-    TC_BIN_REPOS_JSON, TEST_CASES_100_JSON_PATH, TEST_CASES_1000_JSON_PATH, TEST_CASES_10000_JSON_PATH
+    TC_BIN_REPOS_JSON, TEST_CASES_100_JSON_PATH, TEST_CASES_1000_JSON_PATH, TEST_CASES_10000_JSON_PATH, PROCESS_NUM
+from utils.elf_utils import extract_elf_strings
 
 
 # @Time : 2023/12/6 18:46
@@ -23,40 +27,56 @@ def generate_tc_information():
     bin_repo_test_cases_dict = load_bin_repo_info(src_repo_ids, tc_summary)
 
     # 版本过滤【只保留最新，最旧和中间的一个版本】
-    tc_100, tc_1000, tc_10000 = filter_test_cases(bin_repo_test_cases_dict)
-
-    with open(TEST_CASES_100_JSON_PATH, 'w') as f:
-        json.dump(tc_100, f, ensure_ascii=False)
-
-    with open(TEST_CASES_1000_JSON_PATH, 'w') as f:
-        json.dump(tc_1000, f, ensure_ascii=False)
+    tc_10000, tc_1000, tc_100 = filter_test_cases(bin_repo_test_cases_dict)
 
     with open(TEST_CASES_10000_JSON_PATH, 'w') as f:
         json.dump(tc_10000, f, ensure_ascii=False)
 
+    with open(TEST_CASES_1000_JSON_PATH, 'w') as f:
+        json.dump(tc_1000, f, ensure_ascii=False)
+    with open(TEST_CASES_100_JSON_PATH, 'w') as f:
+        json.dump(tc_100, f, ensure_ascii=False)
+
 
 def filter_test_cases(bin_repo_test_cases_dict):
-    # 先筛选100个库，然后随机选择其中的1个版本
-    tc_100_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 100)
-    tc_100_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_100_repo_ids]
+    tc_repo_files_10000 = generate_tc_repo_files(bin_repo_test_cases_dict, 10000)
+    tc_repo_files_1000 = generate_tc_repo_files(bin_repo_test_cases_dict, 1000)
+    tc_repo_files_100 = generate_tc_repo_files(bin_repo_test_cases_dict, 100)
 
-    tc_1000_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 1000)
-    tc_1000_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_1000_repo_ids]
+    return tc_repo_files_10000, tc_repo_files_1000, tc_repo_files_100
 
-    tc_10000_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 10000)
-    tc_10000_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_10000_repo_ids]
 
-    def count_elf_num(repos):
-        count = 0
-        for repo in repos:
-            count += len(repo["elf_paths"])
-        logger.info(f"elf_num: {count}")
+def generate_tc_repo_files(bin_repo_test_cases_dict, sample_size=10000):
+    # 先随机选择10000个库
+    tc_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), sample_size)
 
-    count_elf_num(tc_100_repos)
-    count_elf_num(tc_1000_repos)
-    count_elf_num(tc_10000_repos)
+    # 然后随机选择他们的版本
+    tc_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_repo_ids]
 
-    return tc_100_repos, tc_1000_repos, tc_10000_repos
+    # 然后生成简要信息
+    tc_repo_files = [
+        {
+            "repo_id": repo["repo_id"],
+            "version_id": repo["version_id"],
+            "elf_path": elf_path
+        }
+        for repo in tc_repos
+        for elf_path in repo["elf_paths"]
+    ]
+
+    # 然后多进程并发提取他们的字符串
+    pool = multiprocessing.Pool(processes=PROCESS_NUM)
+    results = pool.imap_unordered(extract_tc_repo_strings, tc_repo_files)
+    tc_repo_files = [r for r in tqdm(results, total=len(tc_repo_files), desc="extract_tc_repo_strings")]
+    pool.close()
+    pool.join()
+
+    return tc_repo_files
+
+
+def extract_tc_repo_strings(repo):
+    repo["strings"] = extract_elf_strings(repo['elf_path'])
+    return repo
 
 
 def load_bin_repo_info(src_repo_ids, tc_summary):

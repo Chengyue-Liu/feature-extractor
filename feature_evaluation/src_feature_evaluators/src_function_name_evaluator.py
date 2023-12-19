@@ -111,9 +111,11 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
 
     def sca_summary(self, test_case_count, test_case_file_count, threshold):
         # basic summary
-        logger.critical(f"repo_num: {len(self.repo_features)}, string_num: {len(self.function_name_repo_dict)}")
-        logger.critical(f"testcase repo num:{test_case_count}, testcase file num:{test_case_file_count}")
-        logger.critical(f"THRESHOLD: {threshold}")
+        logger.critical(f"收录的库数量：{len(self.src_function_name_feature_dict)}, "
+                        f"函数名数量: {len(self.function_name_repo_dict)}")
+        logger.critical(f"测试用例情况:{test_case_count}, testcase file num:{test_case_file_count}")
+        logger.critical(f"测试阈值: {threshold}")
+        logger.critical(f"检测结果：")
         # repo
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
         logger.critical(

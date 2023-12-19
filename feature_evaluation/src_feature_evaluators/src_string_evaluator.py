@@ -61,8 +61,7 @@ class SrcStringEvaluator(FeatureEvaluator):
         logger.info(f"{self.__class__.__name__} inited...")
 
     def evaluate(self):
-        # sca 效果评估
-        self.sca_evaluate(SRC_STRING_SCA_THRESHOLD)
+
 
         # 分布统计
         logger.info(f"generate repo_string_nums")
@@ -75,6 +74,8 @@ class SrcStringEvaluator(FeatureEvaluator):
         self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5]
                             , sample_name="src_string", feature_name="src_repo")
 
+        # sca 效果评估
+        self.sca_evaluate(SRC_STRING_SCA_THRESHOLD)
     def sca(self, file_path):
         # 文件名称
         file_name = os.path.split(file_path)[-1]
@@ -106,10 +107,11 @@ class SrcStringEvaluator(FeatureEvaluator):
         return filtered_results
 
     def sca_summary(self, test_case_count, test_case_file_count, threshold):
-        # basic summary
-        logger.critical(f"repo_num: {len(self.repo_features)}, string_num: {len(self.string_repo_dict)}")
-        logger.critical(f"testcase repo num:{test_case_count}, testcase file num:{test_case_file_count}")
-        logger.critical(f"THRESHOLD: {threshold}")
+        logger.critical(f"收录的库数量：{len(self.src_string_feature_dict)}, "
+                        f"字符串数量: {len(self.string_repo_dict)}")
+        logger.critical(f"测试用例情况:{test_case_count}, testcase file num:{test_case_file_count}")
+        logger.critical(f"测试阈值: {threshold}")
+        logger.critical(f"检测结果：")
         # repo
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
         logger.critical(

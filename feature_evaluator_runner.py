@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from loguru import logger
 
 from feature_evaluation.bin_feature_evaluators.bin_string_evaluator import BinStringEvaluator
+from feature_evaluation.entities import TestCase
 from feature_evaluation.src_feature_evaluators.src_function_name_evaluator import SrcFunctionNameEvaluator
 from feature_evaluation.src_feature_evaluators.src_string_evaluator import SrcStringEvaluator
 
@@ -14,17 +16,20 @@ from feature_evaluation.src_feature_evaluators.src_string_evaluator import SrcSt
 
 def main():
     # 生成任务
+    logger.info(f"init testcases")
+    test_cases = TestCase.get_test_cases()
+
     # bin string
     evaluator = BinStringEvaluator()
-    evaluator.evaluate()
+    evaluator.evaluate(test_cases)
 
     # src string
-    evaluator = SrcStringEvaluator()
-    evaluator.evaluate()
-
-    # src function name
-    evaluator = SrcFunctionNameEvaluator()
-    evaluator.evaluate()
+    # evaluator = SrcStringEvaluator()
+    # evaluator.evaluate()
+    #
+    # # src function name
+    # evaluator = SrcFunctionNameEvaluator()
+    # evaluator.evaluate()
 
     # 常用命令
     # nohup python feature_evaluator_runner.py &

@@ -77,7 +77,7 @@ class FeatureEvaluator:
         logger.info(f"init_repo_features finished.")
         return repo_features
 
-    def statistic_data(self, data: List[int], specific_values, sample_name="库",feature_name="特征"):
+    def statistic_data(self, data: List[int], specific_values, sample_name="库", feature_name="特征"):
         sample_num = len(data)
         sum_value = sum(data)
 
@@ -184,10 +184,8 @@ class FeatureEvaluator:
             recall = 0
         return round(precision, 2), round(recall, 2)
 
-    def sca_evaluate(self, threshold):
+    def sca_evaluate(self, test_cases, threshold):
         # walk all binaries
-        logger.info(f"init testcases")
-        test_cases = TestCase.get_test_cases()
         test_case_file_count = 0
         logger.info(f"start sca_evaluate")
         # walk all feature

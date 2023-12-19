@@ -58,7 +58,7 @@ class BinStringEvaluator(FeatureEvaluator):
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited")
 
-    def evaluate(self):
+    def evaluate(self,test_cases):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
         self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], sample_name="bin_repo",
@@ -69,7 +69,7 @@ class BinStringEvaluator(FeatureEvaluator):
                             feature_name="bin_repo")
 
         # sca 效果评估
-        self.sca_evaluate(BIN_STRING_SCA_THRESHOLD)
+        self.sca_evaluate(test_cases,BIN_STRING_SCA_THRESHOLD)
 
     def sca(self, file_path):
         # 文件名称
@@ -101,9 +101,13 @@ class BinStringEvaluator(FeatureEvaluator):
 
     def sca_summary(self, test_case_count, test_case_file_count, threshold):
         # basic summary
-        logger.critical(f"repo_num: {len(self.repo_features)}, string_num: {len(self.string_repo_dict)}")
-        logger.critical(f"testcase repo num:{test_case_count}, testcase file num:{test_case_file_count}")
-        logger.critical(f"THRESHOLD: {threshold}")
+        logger.critical(f"收录的库数量：{len(self.bin_string_feature_dict)}, "
+                        f"{len(self.repo_features)}(区分release, arch), "
+                        f"字符串数量: {len(self.string_repo_dict)}")
+        logger.critical(f"测试用例情况:{test_case_count}, testcase file num:{test_case_file_count}")
+        logger.critical(f"测试阈值: {threshold}")
+        logger.critical(f"检测结果：")
+
         # repo
         precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
         logger.critical(
