@@ -37,7 +37,9 @@ if __name__ == '__main__':
     # 经过两次筛选后，剩余的大概的数量：
     # src_repo_num: 13523
     # src_repo_version_ids: 27294
+
     # bin_repo_num: 12575
+    # repo_version_num: 25403
     # different_bin_repo_num: 128051
 
     # step 4: 简要统计
@@ -47,6 +49,7 @@ if __name__ == '__main__':
     # step 5: 筛选测试用例ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
     logger.info("step 5: 筛选测试用例")
     generate_tc_information()
+
     # 测试用例数量
     # filtered_tc_repo_num: 12575
     # filtered_tc_repo_version_num: 14460

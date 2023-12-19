@@ -7,7 +7,7 @@ import random
 from loguru import logger
 
 from settings import BIN_REPOS_JSON, SRC_REPOS_JSON, TEST_CASES_JSON_PATH, TEST_CASE_SAMPLE_SIZE_PER_REPO, \
-    TC_BIN_REPOS_JSON
+    TC_BIN_REPOS_JSON, TEST_CASES_100_JSON_PATH, TEST_CASES_1000_JSON_PATH, TEST_CASES_10000_JSON_PATH
 
 
 # @Time : 2023/12/6 18:46
@@ -23,53 +23,30 @@ def generate_tc_information():
     bin_repo_test_cases_dict = load_bin_repo_info(src_repo_ids, tc_summary)
 
     # 版本过滤【只保留最新，最旧和中间的一个版本】
-    filter_test_cases(bin_repo_test_cases_dict, tc_summary)
+    tc_100, tc_1000, tc_10000 = filter_test_cases(bin_repo_test_cases_dict)
 
-    # 保存
-    test_case_info = {
-        "tc_summary": tc_summary,
-        "bin_repo_test_cases_dict": bin_repo_test_cases_dict,
-    }
-    with open(TEST_CASES_JSON_PATH, 'w') as f:
-        json.dump(test_case_info, f, ensure_ascii=False)
+    with open(TEST_CASES_100_JSON_PATH, 'w') as f:
+        json.dump(tc_100, f, ensure_ascii=False)
 
-    # 额外保存一份 bin_repos 格式的
-    tc_bin_repos = []
-    for bin_repos in bin_repo_test_cases_dict.values():
-        tc_bin_repos.extend(bin_repos)
-    with open(TC_BIN_REPOS_JSON, 'w') as f:
-        json.dump(tc_bin_repos, f, ensure_ascii=False)
+    with open(TEST_CASES_1000_JSON_PATH, 'w') as f:
+        json.dump(tc_1000, f, ensure_ascii=False)
+
+    with open(TEST_CASES_10000_JSON_PATH, 'w') as f:
+        json.dump(tc_10000, f, ensure_ascii=False)
 
 
-def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
-    filtered_bin_repo_num = 0
-    filtered_elf_file_num = 0
-    for repo_id, repos in bin_repo_test_cases_dict.items():
-        if len(test_cases := bin_repo_test_cases_dict[repo_id]) > TEST_CASE_SAMPLE_SIZE_PER_REPO:
-            # 按照版本倒序排列
-            test_cases.sort(key=lambda x: x["repo_release"], reverse=True)
-            test_cases.sort(key=lambda x: x["repo_version"], reverse=True)
+def filter_test_cases(bin_repo_test_cases_dict):
+    # 先筛选100个库，然后随机选择其中的1个版本
+    tc_100_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 100)
+    tc_100_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_100_repo_ids]
 
-            # 取最新，最旧
-            test_cases.append(repos[1])
-            test_cases.append(repos[-1])
+    tc_1000_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 1000)
+    tc_1000_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_1000_repo_ids]
 
-            # 然后从中间随机补充
-            test_cases = random.sample(repos[1:-1], TEST_CASE_SAMPLE_SIZE_PER_REPO - 2)
+    tc_10000_repo_ids = random.sample(list(bin_repo_test_cases_dict.keys()), 10000)
+    tc_10000_repos = [random.sample(bin_repo_test_cases_dict[repo_id], 1)[0] for repo_id in tc_10000_repo_ids]
 
-        filtered_bin_repo_num += len(test_cases)
-        for test_case in test_cases:
-            filtered_elf_file_num += len(test_case["elf_paths"])
-    logger.info(
-        f"TEST_CASE_SAMPLE_SIZE_PER_REPO: {TEST_CASE_SAMPLE_SIZE_PER_REPO}\n"
-        f"filtered_tc_repo_num: {len(bin_repo_test_cases_dict)}\n"
-        f"filtered_tc_repo_version_num: {filtered_bin_repo_num}\n"
-        f"filtered_tc_elf_file_num: {filtered_elf_file_num}\n")
-
-    tc_summary["TEST_CASE_SAMPLE_SIZE_PER_REPO"] = TEST_CASE_SAMPLE_SIZE_PER_REPO
-    tc_summary["filtered_bin_repo_num"] = len(bin_repo_test_cases_dict)
-    tc_summary["filtered_tc_repo_version_num"] = filtered_bin_repo_num
-    tc_summary["filtered_elf_file_num"] = filtered_elf_file_num
+    return tc_100_repos, tc_1000_repos, tc_10000_repos
 
 
 def load_bin_repo_info(src_repo_ids, tc_summary):
