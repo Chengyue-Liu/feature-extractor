@@ -48,9 +48,9 @@ if __name__ == '__main__':
     generate_tc_information()
 
     # 测试用例数量
-    # filtered_tc_repo_num: 12575
-    # filtered_tc_repo_version_num: 14460
-    # filtered_tc_elf_file_num: 74458
+    # tc_100, elf: 354
+    # tc_1000, elf: 4445
+    # tc_10000, elf: 43781
 
 
     logger.info(f"all finished.")
