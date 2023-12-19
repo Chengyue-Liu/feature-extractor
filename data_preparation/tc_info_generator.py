@@ -42,8 +42,8 @@ def generate_tc_information():
 
 
 def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
-    bin_repo_test_case_num = 0
-    bin_file_test_case_num = 0
+    filtered_bin_repo_num = 0
+    filtered_elf_file_num = 0
     for repo_id, repos in bin_repo_test_cases_dict.items():
         if len(test_cases := bin_repo_test_cases_dict[repo_id]) > TEST_CASE_SAMPLE_SIZE_PER_REPO:
             # 按照版本倒序排列
@@ -57,24 +57,22 @@ def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
             # 然后从中间随机补充
             test_cases = random.sample(repos[1:-1], TEST_CASE_SAMPLE_SIZE_PER_REPO - 2)
 
-        bin_repo_test_case_num += len(test_cases)
+        filtered_bin_repo_num += len(test_cases)
         for test_case in test_cases:
-            bin_file_test_case_num += len(test_case["elf_paths"])
+            filtered_elf_file_num += len(test_case["elf_paths"])
     logger.info(
         f"TEST_CASE_SAMPLE_SIZE_PER_REPO: {TEST_CASE_SAMPLE_SIZE_PER_REPO}\n"
-        f"tc repo num: {len(bin_repo_test_cases_dict)}\n"
-        f"tc repo version num: {bin_repo_test_case_num}\n"
-        f"tc file num: {bin_file_test_case_num}\n")
+        f"filtered_test_cases_num: {filtered_bin_repo_num}\n"
+        f"filtered_elf_file_num: {filtered_elf_file_num}\n")
 
     tc_summary["TEST_CASE_SAMPLE_SIZE_PER_REPO"] = TEST_CASE_SAMPLE_SIZE_PER_REPO
-    tc_summary["tc_repo_num"] = len(bin_repo_test_cases_dict)
-    tc_summary["tc_repo_version_num"] = bin_repo_test_case_num
-    tc_summary["tc_file_num"] = bin_file_test_case_num
+    tc_summary["filtered_bin_repo_num"] = filtered_bin_repo_num
+    tc_summary["filtered_elf_file_num"] = filtered_elf_file_num
 
 
 def load_bin_repo_info(src_repo_ids, tc_summary):
-    bin_repo_num = 0
-    bin_with_src_repo_num = 0
+    bin_repo_with_elf_num = 0
+    bin_repo_with_elf_with_src_num = 0
     bin_repo_test_cases_dict = collections.defaultdict(list)  # repo_id: repos
     with open(BIN_REPOS_JSON) as f:
         bin_repos = json.load(f)
@@ -82,17 +80,21 @@ def load_bin_repo_info(src_repo_ids, tc_summary):
         for bin_repo in bin_repos:
             if not bin_repo["elf_paths"]:
                 continue
-            bin_repo_num += 1
+
+            bin_repo_with_elf_num += 1
             repo_id = bin_repo["repo_id"]
-            if repo_id in src_repo_ids:
-                bin_repo_test_cases_dict[repo_id].append(bin_repo)
-                bin_with_src_repo_num += 1
-    logger.info(f"all bin package num: {all_bin_repo_num}\n"
-                f"bin package with elf repo num: {bin_repo_num}\n"
-                f"bin package with elf with src repo num: {bin_with_src_repo_num}\n")
-    tc_summary["all_bin_package_num"] = all_bin_repo_num
-    tc_summary["bin_package_with_elf_repo_num"] = bin_repo_num
-    tc_summary["bin_package_with_elf_with_src_repo_num"] = bin_with_src_repo_num
+            if repo_id not in src_repo_ids:
+                continue
+
+            bin_repo_with_elf_with_src_num += 1
+            bin_repo_test_cases_dict[repo_id].append(bin_repo)
+    logger.info(f"bin_repo_num: {all_bin_repo_num}\n"
+                f"bin_repo_with_elf_num: {bin_repo_with_elf_num}\n"
+                f"bin_repo_with_elf_with_src_num: {bin_repo_with_elf_with_src_num}\n")
+
+    tc_summary["bin_repo_num"] = all_bin_repo_num
+    tc_summary["bin_repo_with_elf_num"] = bin_repo_with_elf_num
+    tc_summary["bin_repo_with_elf_with_src_num"] = bin_repo_with_elf_with_src_num
     return bin_repo_test_cases_dict
 
 

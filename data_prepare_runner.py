@@ -18,8 +18,9 @@ if __name__ == '__main__':
     # step 1: 获取tar 文件路径
     logger.info("step 1: 获取tar 文件路径")
     # src_tar_paths, bin_tar_paths = get_tar_file_paths()
+    # 大概的数量：未知
 
-    # step x: 初步筛选掉非arm/amd64, 非c/cpp语言的包
+    # step x: 初步筛选掉非arm/amd64, 以及仅凭名称判断不是c/cpp语言的包
     logger.info("step x: 筛选bin 路径")
     # src_tar_paths, bin_tar_paths = filter_bin_tar_paths(src_tar_paths, bin_tar_paths)
     # 大概的数量：src_tar_paths: 71k, bin_tar_paths:310k
@@ -28,26 +29,24 @@ if __name__ == '__main__':
     logger.info("step 2: 解压")
     # multiple_decompress(src_tar_paths, bin_tar_paths)
 
-    # step 3: 生成源码和二进制文件路径[这个过程中有后续补充的筛选逻辑]
+    # step 3: 生成源码和二进制文件路径
+    # 同时这里有第二次筛选：同时筛选掉没有c/cpp文件的源码，以及没有elf的二进制包
     logger.info("step 3: 生成源码和二进制文件路径")
-    generate_repositories_json()
-    # 大概的数量：src_repo:54k , bin_repo: 180k
-    # 再次筛选条件：src 有c/cpp, bin 有二进制，且源码二进制都存在。
+    # generate_repositories_json()
+
+    # 经过两次筛选后，剩余的大概的数量：
     # src repo: 13523
     # src repo version: 27294
-    # bin package: 128051
+    # bin package: 128051 【两个架构，多种release, 平均每个版本4.69个二进制文件】
 
     # step 4: 简要统计
-    logger.info("step 4: 简要统计")
-    statistic_data()
+    logger.info("step 4: 简要统计， 没有做什么事情")
+    # statistic_data()
 
     # step 5: 筛选测试用例ps aux | grep "rsync" | grep -v grep | awk '{print $2}' | xargs kill
     logger.info("step 5: 筛选测试用例")
     generate_tc_information()
-    # 测试用例数量：
-    # tc repo num: 12575
-    # tc repo version num: 144600
-    # tc file num: 68878
+
 
     logger.info(f"all finished.")
     """

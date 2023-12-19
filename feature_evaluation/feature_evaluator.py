@@ -77,9 +77,7 @@ class FeatureEvaluator:
         logger.info(f"init_repo_features finished.")
         return repo_features
 
-    def statistic_data(self, data: List[int], specific_values, data_desc="statistics"):
-        if not data_desc:
-            data_desc = "statistic_in_repo_view"
+    def statistic_data(self, data: List[int], specific_values, sample_name="库",feature_name="特征"):
         sample_num = len(data)
         sum_value = sum(data)
 
@@ -101,16 +99,16 @@ class FeatureEvaluator:
         q_90 = np.percentile(data, 90)
 
         # 输出统计结果
-        logger.critical(data_desc)
-        logger.critical(f"样本量: {sample_num}")
-        logger.critical(f"总计[未去重]: {sum_value}")
-        logger.critical(f"均值: {mean_value}")
-        logger.critical(f"最小值: {min_value}")
-        logger.critical(f"最大值: {max_value}")
-        logger.critical(f"第一四分位数 (Q1): {q1}")
-        logger.critical(f"中位数: {median_value}")
-        logger.critical(f"第三四分位数 (Q3): {q3}")
-        logger.critical(f"第90分位数 (Q_90): {q_90}")
+        logger.critical(f"{sample_name} ---> {feature_name}")
+        logger.critical(f"{sample_name}数量: {sample_num}")
+        logger.critical(f"{feature_name}总计[未去重]: {sum_value}")
+        logger.critical(f"{feature_name}均值: {mean_value}")
+        logger.critical(f"{feature_name}最小值: {min_value}")
+        logger.critical(f"{feature_name}最大值: {max_value}")
+        logger.critical(f"{feature_name}第一四分位数 (Q1): {q1}")
+        logger.critical(f"{feature_name}中位数: {median_value}")
+        logger.critical(f"{feature_name}第三四分位数 (Q3): {q3}")
+        logger.critical(f"{feature_name}第90分位数 (Q_90): {q_90}")
 
         def cal_percent(count):
             return f"{round((count / len(data) * 100), 2)}%"
@@ -120,13 +118,14 @@ class FeatureEvaluator:
             # 特定值数量
             specific_value_count = len([d for d in data if d == specific_value])
             logger.critical(
-                f"{specific_value} count: {specific_value_count}, percent: {cal_percent(specific_value_count)}")
+                f"{specific_value_count}个{sample_name}包含{specific_value}个{feature_name}, 占比: {cal_percent(specific_value_count)}")
             special_value_dict[specific_value] = {
                 "count": specific_value_count,
                 "percent": cal_percent(specific_value_count)
             }
         self.evaluate_result["data_desc"] = {
-            "data_desc": data_desc,
+            "sample_name": sample_name,
+            "feature_name": feature_name,
             "sample_num": sample_num,
             "sum_value": sum_value,
             "mean_value": mean_value,

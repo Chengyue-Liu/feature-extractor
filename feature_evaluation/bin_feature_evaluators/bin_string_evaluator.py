@@ -4,6 +4,7 @@ import os
 from collections import Counter
 
 from loguru import logger
+from tqdm import tqdm
 
 from feature_evaluation.entities import BinStringFeature
 from feature_evaluation.feature_evaluator import FeatureEvaluator
@@ -25,7 +26,7 @@ class BinStringEvaluator(FeatureEvaluator):
         # 转换特征
         logger.info("convert feature")
         self.bin_string_feature_dict = dict()
-        for repo_feature in self.repo_features:
+        for repo_feature in tqdm(self.repo_features, total=len(self.repo_features), desc="convert feature"):
             key = f"{repo_feature.repository.repo_id}-{repo_feature.repository.version_id}"
             if not self.bin_string_feature_dict.get(repo_feature.repository.version_key):
                 self.bin_string_feature_dict[key] = BinStringFeature(repo_feature)
@@ -43,7 +44,8 @@ class BinStringEvaluator(FeatureEvaluator):
         logger.info("倒排索引表")
         self.string_repo_dict = dict()
         self.string_repo_version_dict = dict()
-        for repo_feature in self.bin_string_feature_dict.values():
+        for repo_feature in tqdm(self.bin_string_feature_dict.values(), total=len(self.bin_string_feature_dict),
+                                 desc="倒排索引表"):
             repo_id = repo_feature.repository.repo_id
             version_id = repo_feature.repository.version_id
             for string in repo_feature.strings:
@@ -59,11 +61,12 @@ class BinStringEvaluator(FeatureEvaluator):
     def evaluate(self):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
-        self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
+        self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], sample_name="bin_repo",
+                            feature_name="bin_string")
 
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
-        self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5],
-                            data_desc="statistic_in_string_view")
+        self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5], sample_name="bin_string",
+                            feature_name="bin_repo")
 
         # sca 效果评估
         self.sca_evaluate(BIN_STRING_SCA_THRESHOLD)

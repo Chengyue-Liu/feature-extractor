@@ -67,12 +67,13 @@ class SrcStringEvaluator(FeatureEvaluator):
         # 分布统计
         logger.info(f"generate repo_string_nums")
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.src_string_feature_dict.values()]
-        self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], data_desc="statistic_in_repo_view")
+        self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], sample_name="src_repo",
+                            feature_name="src_string")
 
         logger.info(f"generate string_seen_repository_num_list")
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
-        self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5],
-                            data_desc="statistic_in_string_view")
+        self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5]
+                            , sample_name="src_string", feature_name="src_repo")
 
     def sca(self, file_path):
         # 文件名称
