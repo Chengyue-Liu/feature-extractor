@@ -58,7 +58,7 @@ class BinStringEvaluator(FeatureEvaluator):
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited")
 
-    def evaluate(self,test_cases):
+    def evaluate(self, test_cases):
         # 分布统计
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
         self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], sample_name="bin_repo",
@@ -69,15 +69,9 @@ class BinStringEvaluator(FeatureEvaluator):
                             feature_name="bin_repo")
 
         # sca 效果评估
-        self.sca_evaluate(test_cases,BIN_STRING_SCA_THRESHOLD)
+        self.sca_evaluate(test_cases, BIN_STRING_SCA_THRESHOLD)
 
-    def sca(self, file_path):
-        # 文件名称
-        file_name = os.path.split(file_path)[-1]
-
-        # 提取二进制字符串
-        strings = extract_elf_strings(file_path)
-
+    def sca(self, strings):
         # 根据字符串查询对应的library_id, version_id
         string_repo_id_version_id_tuple_list = []
         for string in strings:

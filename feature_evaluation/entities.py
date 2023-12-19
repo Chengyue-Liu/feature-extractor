@@ -62,15 +62,12 @@ class TestCase:
         """
         with open(f_path) as f:
             repo_jsons = json.load(f)
-            test_cases = []
-            for repo_json in repo_jsons:
-                repo_id = repo_json["repo_id"]
-                version_id = repo_json["version_id"]
-                file_paths = repo_json["elf_paths"]
-                tc = TestCase(
-                    ground_truth_repo_id=repo_id,
-                    ground_truth_version_id=version_id,
-                    file_paths=file_paths
+            test_cases = [
+                TestCase(
+                    ground_truth_repo_id=repo_json["repo_id"],
+                    ground_truth_version_id=repo_json["version_id"],
+                    file_path=repo_json["elf_path"],
+                    file_strings=repo_json["strings"],
                 )
-                test_cases.append(tc)
+                for repo_json in repo_jsons]
         return test_cases

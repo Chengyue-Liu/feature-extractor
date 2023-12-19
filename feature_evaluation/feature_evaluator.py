@@ -184,22 +184,18 @@ class FeatureEvaluator:
             recall = 0
         return round(precision, 2), round(recall, 2)
 
-    def sca_evaluate(self, test_cases, threshold):
+    def sca_evaluate(self, test_cases: List[TestCase], threshold):
         # walk all binaries
-        test_case_file_count = 0
         logger.info(f"start sca_evaluate")
         # walk all feature
         for test_case in tqdm(test_cases, total=len(test_cases), desc="sca_evaluate"):
-            test_case: TestCase
-            test_case_file_count += len(test_case.file_paths)
-            for file_path in test_case.file_paths:
-                # sca【设定一个阈值，只要超过阈值的都返回。】
-                sca_results = self.sca(file_path)
-                # check sca results【统计准确率】
-                self.check(test_case, sca_results)
+            # sca【设定一个阈值，只要超过阈值的都返回。】
+            sca_results = self.sca(test_case.file_strings)
+            # check sca results【统计准确率】
+            self.check(test_case, sca_results)
         logger.info(f"sca_evaluate finished.")
 
-        self.sca_summary(len(test_cases), test_case_file_count, threshold)
+        self.sca_summary(len(test_cases), len(test_cases), threshold)
 
     @abstractmethod
     def sca(self, file_path):
