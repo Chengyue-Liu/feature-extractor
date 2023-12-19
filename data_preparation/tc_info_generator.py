@@ -72,30 +72,22 @@ def filter_test_cases(bin_repo_test_cases_dict, tc_summary):
 
 
 def load_bin_repo_info(src_repo_ids, tc_summary):
-    bin_repo_with_elf_num = 0
-    bin_repo_with_elf_with_src_num = 0
     bin_repo_test_cases_dict = collections.defaultdict(list)  # repo_id: repos
-    with open(BIN_REPOS_JSON) as f:
-        bin_repos = json.load(f)
-        all_bin_repo_num = len(bin_repos)
-        for bin_repo in bin_repos:
-            if not bin_repo["elf_paths"]:
-                continue
 
-            bin_repo_with_elf_num += 1
+    with open(BIN_REPOS_JSON) as f:
+        repo_id_set = set()
+        bin_repos = json.load(f)
+        for bin_repo in bin_repos:
             repo_id = bin_repo["repo_id"]
             if repo_id not in src_repo_ids:
                 continue
-
-            bin_repo_with_elf_with_src_num += 1
+            repo_id_set.add(repo_id)
             bin_repo_test_cases_dict[repo_id].append(bin_repo)
-    logger.info(f"bin_repo_num: {all_bin_repo_num}\n"
-                f"bin_repo_with_elf_num: {bin_repo_with_elf_num}\n"
-                f"bin_repo_with_elf_with_src_num: {bin_repo_with_elf_with_src_num}\n")
+    logger.info(f"\nbin_repo_num: {len(repo_id_set)}\n"
+                f"different_bin_repo_num: {len(bin_repos)}\n")
 
-    tc_summary["bin_repo_num"] = all_bin_repo_num
-    tc_summary["bin_repo_with_elf_num"] = bin_repo_with_elf_num
-    tc_summary["bin_repo_with_elf_with_src_num"] = bin_repo_with_elf_with_src_num
+    tc_summary["bin_repo_num"] = len(repo_id_set)
+    tc_summary["different_bin_repo_num"] = len(bin_repos)
     return bin_repo_test_cases_dict
 
 
@@ -106,18 +98,14 @@ def load_src_repo_info(tc_summary):
         src_repos = json.load(f)
         all_src_repo_num = len(src_repos)
         for src_repo in src_repos:
-            target_src_file_num = src_repo["target_src_file_num"]
-            if not target_src_file_num:
-                continue
             repo_id = src_repo["repo_id"]
             src_repo_ids.add(repo_id)
             version_id = src_repo["version_id"]
             version_key = f"{repo_id}-{version_id}"
             src_repo_version_ids.add(version_key)
-    logger.info(f"src_repo_num: {all_src_repo_num}\n"
-                f"src repo with target file num: {len(src_repo_ids)}\n"
-                f"src repo version with target file num: {len(src_repo_version_ids)}\n")
+    logger.info(f"\nsrc_repo_num: {all_src_repo_num}\n"
+                f"src repo with target file num: {len(src_repo_ids)}\n")
+
     tc_summary["all_src_repo_num"] = all_src_repo_num
     tc_summary["src_repo_with_target_file_num"] = len(src_repo_ids)
-    tc_summary["src_repo_version_with_target_file_num"] = len(src_repo_version_ids)
     return src_repo_ids
