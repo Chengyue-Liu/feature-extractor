@@ -76,19 +76,26 @@ def load_bin_repo_info(src_repo_ids, tc_summary):
 
     with open(BIN_REPOS_JSON) as f:
         repo_id_set = set()
+        repo_version_id_set = set()
         bin_repos = json.load(f)
         for bin_repo in bin_repos:
             repo_id = bin_repo["repo_id"]
             if repo_id not in src_repo_ids:
                 continue
             repo_id_set.add(repo_id)
+            version_id = bin_repo["version_id"]
+            version_key = f"{repo_id}-{version_id}"
+            repo_version_id_set.add(version_key)
             bin_repo_test_cases_dict[repo_id].append(bin_repo)
     bin_repo_num = len(repo_id_set)
+    repo_version_num = len(repo_version_id_set)
     different_bin_repo_num = len(bin_repos)
     logger.info(f"\nbin_repo_num: {bin_repo_num}\n"
+                f"repo_version_num: {repo_version_num}\n"
                 f"different_bin_repo_num: {different_bin_repo_num}\n")
 
     tc_summary["bin_repo_num"] = bin_repo_num
+    tc_summary["repo_version_num"] = repo_version_num
     tc_summary["different_bin_repo_num"] = different_bin_repo_num
     return bin_repo_test_cases_dict
 

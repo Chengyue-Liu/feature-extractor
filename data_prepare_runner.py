@@ -35,9 +35,10 @@ if __name__ == '__main__':
     # generate_repositories_json()
 
     # 经过两次筛选后，剩余的大概的数量：
-    # src repo: 13523
-    # src repo version: 27294
-    # bin package: 128051 【两个架构，多种release, 平均每个版本4.69个二进制文件】
+    # src_repo_num: 13523
+    # src_repo_version_ids: 27294
+    # bin_repo_num: 12575
+    # different_bin_repo_num: 128051
 
     # step 4: 简要统计
     logger.info("step 4: 简要统计， 没有做什么事情")
@@ -47,9 +48,9 @@ if __name__ == '__main__':
     logger.info("step 5: 筛选测试用例")
     generate_tc_information()
     # 测试用例数量
-    # filtered_tc_repo_num: 12575 : 有二进制，有源码的库
-    # filtered_test_cases_num: 14460 ： 二进制包数量
-    # filtered_elf_file_num: 大概6万多个 ： elf文件数量
+    # filtered_tc_repo_num: 12575
+    # filtered_tc_repo_version_num: 14460
+    # filtered_tc_elf_file_num: 74458
 
 
     logger.info(f"all finished.")
