@@ -38,10 +38,12 @@ def merge_repo_features(root_feature_dir=FEATURE_RESULT_DIR):
                     repo_features.append(repo_feature)
         merged_repo_feature_file_path = os.path.join(feature_dir_path, "merged_feature.pkl")
 
+        logger.info(f"dumping... {merged_repo_feature_file_path}")
         with open(merged_repo_feature_file_path, 'wb') as f:
             pickle.dump(repo_features, f)
+        logger.info(f"dumping... {merged_repo_feature_file_path} finished.")
 
-        logger.info(f"merge repo features finished.")
+    logger.info(f"merge repo features finished.")
 
 
 def run_evaluator(evaluator: FeatureEvaluator, test_case_file_name, test_cases, threshold):
@@ -105,8 +107,8 @@ def main():
 if __name__ == '__main__':
     logger.remove()
     logger.add(level="INFO", sink=sys.stdout)
-    main()
-    # merge_repo_features()
+    # main()
+    merge_repo_features()
 # todo
 """
 1. 后续其他的特征，一定要存到postgres中。存在文件中，每次读取太慢了。
