@@ -104,8 +104,8 @@ def main():
 if __name__ == '__main__':
     logger.remove()
     logger.add(level="INFO", sink=sys.stdout)
-    main()
-    # merge_repo_features()
+    # main()
+    merge_repo_features()
 # todo
 """
 1. 后续其他的特征，一定要存到postgres中。存在文件中，每次读取太慢了。
