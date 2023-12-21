@@ -147,6 +147,22 @@ class RepoFeature:
                 file_features=file_features
             )
 
+    @classmethod
+    def init_repo_feature_from_merged_json_file(cls, file_path):
+        repos = []
+        with open(file_path) as f:
+            datas = json.load(f)
+            for data in datas:
+                repository = Repository.init_repository_from_json_data(data["repository"])
+                file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json
+                                 in
+                                 data['file_features']]
+                repos.append(RepoFeature(
+                    repository=repository,
+                    file_features=file_features
+                ))
+        return repos
+
 
 from binaryninja import Function, BasicBlock
 

@@ -10,7 +10,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from feature_evaluation.entities import TestCase
-from feature_extraction.entities import RepoFeature
+from feature_extraction.entities import RepoFeature, Repository, FileFeature
 from settings import FEATURE_RESULT_DIR, TEST_CASES_JSON_PATH, SCA_RESULTS_DIR
 
 
@@ -23,8 +23,11 @@ class FeatureEvaluator:
         # 从文件加载原始特征
         self.extractor_name = extractor_name
         self.feature_dir = os.path.join(FEATURE_RESULT_DIR, extractor_name)
-        self.merged_feature_path = os.path.join(self.feature_dir, f"{self.__class__.__name__}.json")
-        self.repo_features: List[RepoFeature] = self.init_repo_features()
+        self.merged_feature_path = os.path.join(self.feature_dir, f"merged_feature.json")
+        print(self.merged_feature_path, os.path.exists(self.merged_feature_path))
+        self.repo_features: List[RepoFeature] = self.init_from_merged_repo_features() \
+            if os.path.exists(self.merged_feature_path) \
+            else self.init_repo_features()
 
         # 初始化id集合
         logger.info(f"init ids")
@@ -105,6 +108,12 @@ class FeatureEvaluator:
             if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
                 f_path = os.path.join(self.feature_dir, f)
                 repo_features.append(RepoFeature.init_repo_feature_from_json_file(f_path))
+        logger.info(f"init_repo_features finished.")
+        return repo_features
+
+    def init_from_merged_repo_features(self):
+        logger.info(f"init_repo_features from merged features...")
+        repo_features = RepoFeature.init_repo_feature_from_merged_json_file(self.merged_feature_path)
         logger.info(f"init_repo_features finished.")
         return repo_features
 

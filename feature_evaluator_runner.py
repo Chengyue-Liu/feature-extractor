@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
 import os.path
 import sys
 
 from loguru import logger
+from tqdm import tqdm
 
 from feature_evaluation.bin_feature_evaluators.bin_string_evaluator import BinStringEvaluator
 from feature_evaluation.entities import TestCase
@@ -11,13 +13,36 @@ from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_evaluation.src_feature_evaluators.src_function_name_evaluator import SrcFunctionNameEvaluator
 from feature_evaluation.src_feature_evaluators.src_string_evaluator import SrcStringEvaluator
 from settings import SRC_STRING_SCA_THRESHOLD, TEST_CASES_JSON_PATH, TEST_CASES_10000_JSON_PATH, \
-    TEST_CASES_1000_JSON_PATH, TEST_CASES_100_JSON_PATH, SRC_FUNCTION_NAME_SCA_THRESHOLD, BIN_STRING_SCA_THRESHOLD
+    TEST_CASES_1000_JSON_PATH, TEST_CASES_100_JSON_PATH, SRC_FUNCTION_NAME_SCA_THRESHOLD, BIN_STRING_SCA_THRESHOLD, \
+    FEATURE_RESULT_DIR
 
 
 # @Time : 2023/11/3 12:06
 # @Author : Liu Chengyue
 # @File : extractor_runner.py
 # @Software: PyCharm
+
+
+def merge_repo_features(root_feature_dir=FEATURE_RESULT_DIR):
+    for feature_dir in os.listdir(root_feature_dir):
+        feature_dir_path = os.path.join(root_feature_dir, feature_dir)
+        logger.info(f"init_repo_features...")
+        repo_features = []
+        feature_files = os.listdir(feature_dir_path)
+        for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
+            if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
+                f_path = os.path.join(feature_dir_path, f)
+                with open(f_path) as f:
+                    repo_feature = json.load(f)
+                    repo_features.append(repo_feature)
+        merged_repo_feature_file_path = os.path.join(feature_dir_path, "merged_feature.json")
+
+        with open(merged_repo_feature_file_path, 'w') as f:
+            json.dump(repo_features, f)
+
+        logger.info(f"init_repo_features finished.")
+
+
 def run_evaluator(evaluator: FeatureEvaluator, test_case_file_name, test_cases, threshold):
     # 设置测试用例
     evaluator.set_test_cases(test_case_file_name, test_cases)
@@ -80,7 +105,7 @@ if __name__ == '__main__':
     logger.remove()
     logger.add(level="INFO", sink=sys.stdout)
     main()
-
+    # merge_repo_features()
 # todo
 """
 1. 后续其他的特征，一定要存到postgres中。存在文件中，每次读取太慢了。
