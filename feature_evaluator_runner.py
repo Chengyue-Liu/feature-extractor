@@ -26,10 +26,10 @@ from settings import SRC_STRING_SCA_THRESHOLD, TEST_CASES_JSON_PATH, TEST_CASES_
 def merge_repo_features(root_feature_dir=FEATURE_RESULT_DIR):
     for feature_dir in os.listdir(root_feature_dir):
         feature_dir_path = os.path.join(root_feature_dir, feature_dir)
-        logger.info(f"init_repo_features...")
+        logger.info(f"merge repo features...")
         repo_features = []
         feature_files = os.listdir(feature_dir_path)
-        for f in tqdm(feature_files, total=len(feature_files), desc="init_repo_features"):
+        for f in tqdm(feature_files, total=len(feature_files), desc="merge repo features"):
             if f.endswith('.json') and str(f[0]).isdigit():  # 不读取合并的特征
                 f_path = os.path.join(feature_dir_path, f)
                 with open(f_path) as f:
@@ -40,7 +40,7 @@ def merge_repo_features(root_feature_dir=FEATURE_RESULT_DIR):
         with open(merged_repo_feature_file_path, 'w') as f:
             json.dump(repo_features, f)
 
-        logger.info(f"init_repo_features finished.")
+        logger.info(f"merge repo features finished.")
 
 
 def run_evaluator(evaluator: FeatureEvaluator, test_case_file_name, test_cases, threshold):
