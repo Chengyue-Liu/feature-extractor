@@ -8,6 +8,7 @@
 # @Software: PyCharm
 import dataclasses
 import json
+import pickle
 from typing import List, Dict
 
 from settings import EDGE_NUM_THRESHOLD
@@ -149,9 +150,10 @@ class RepoFeature:
 
     @classmethod
     def init_repo_feature_from_merged_json_file(cls, file_path):
+        "merged_feature.pkl"
         repos = []
-        with open(file_path) as f:
-            datas = json.load(f)
+        with open(file_path, 'rb') as f:
+            datas = pickle.load(f)
             for data in datas:
                 repository = Repository.init_repository_from_json_data(data["repository"])
                 file_features = [FileFeature.init_file_feature_from_json_data(file_feature_json) for file_feature_json

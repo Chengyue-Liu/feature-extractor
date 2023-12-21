@@ -23,7 +23,7 @@ class FeatureEvaluator:
         # 从文件加载原始特征
         self.extractor_name = extractor_name
         self.feature_dir = os.path.join(FEATURE_RESULT_DIR, extractor_name)
-        self.merged_feature_path = os.path.join(self.feature_dir, f"merged_feature.json")
+        self.merged_feature_path = os.path.join(self.feature_dir, f"merged_feature.pkl")
         print(self.merged_feature_path, os.path.exists(self.merged_feature_path))
         self.repo_features: List[RepoFeature] = self.init_from_merged_repo_features() \
             if os.path.exists(self.merged_feature_path) \
