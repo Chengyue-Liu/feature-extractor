@@ -12,7 +12,7 @@ from feature_evaluation.feature_evaluator import FeatureEvaluator
 from feature_extraction.bin_feature_extractors.bin_string_extractor import BinStringExtractor
 from feature_extraction.src_feature_extractors.src_feature_tree_sitter_extractor import \
     SrcFeatureTreeSitterExtractor
-from settings import SRC_STRING_SCA_THRESHOLD, SRC_FUNCTION_NAME_SCA_THRESHOLD
+from settings import SRC_STRING_SCA_THRESHOLD, SRC_FUNCTION_NAME_SCA_THRESHOLD, TEST_CASES_JSON_PATH
 from utils.elf_utils import extract_elf_strings
 
 
@@ -62,19 +62,22 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited...")
 
-    def evaluate(self,test_cases):
+    def statistic(self):
         # 分布统计
+        logger.info(f"src repo ---> function names")
         repo_function_name_nums = [len(repo_feature.function_names) for repo_feature in
                                    self.src_function_name_feature_dict.values()]
-        self.statistic_data(repo_function_name_nums, specific_values=[0, 1, 2, 3, 4, 5]
-                            , sample_name="src_repo", feature_name="src_function_name")
+        self.repo_to_feature_statistic_result = self.statistic_data(repo_function_name_nums,
+                                                                    specific_values=[0, 1, 2, 3, 4, 5]
+                                                                    , sample_name="src_repo",
+                                                                    feature_name="src_function_name")
 
+        logger.info(f"src function names ---> repo")
         function_name_seen_repository_num_list = [len(v) for v in self.function_name_repo_dict.values()]
-        self.statistic_data(function_name_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5]
-                            , sample_name="src_function_name", feature_name="src_repo")
-
-        # sca 效果评估
-        self.sca_evaluate(test_cases,SRC_FUNCTION_NAME_SCA_THRESHOLD)
+        self.feature_to_repo_statistic_result = self.statistic_data(function_name_seen_repository_num_list,
+                                                                    specific_values=[1, 2, 3, 4, 5]
+                                                                    , sample_name="src_function_name",
+                                                                    feature_name="src_repo")
 
     def sca(self, strings):
 
@@ -92,30 +95,16 @@ class SrcFunctionNameEvaluator(FeatureEvaluator):
         all_results = counter.most_common(20)  # (repo_id, version_id), count
 
         # 筛选
-        filtered_results = []
+        final_result = None
+        max_percent = SRC_FUNCTION_NAME_SCA_THRESHOLD
         for (repo_id, version_id), count in all_results:
             key = f"{repo_id}-{version_id}"
             string_num = self.src_function_name_num_dict.get(key)
             percent = round(count / string_num, 2)
             if percent > SRC_FUNCTION_NAME_SCA_THRESHOLD:
-                filtered_results.append((repo_id, version_id))
-                # 预览扫描结果
-                # print(file_name, percent)
+                if percent > max_percent:
+                    final_result = (repo_id, version_id, percent)
 
-        return filtered_results
-
-    def sca_summary(self, test_case_count, test_case_file_count, threshold):
-        # basic summary
-        logger.critical(f"收录的库数量：{len(self.src_function_name_feature_dict)}, "
-                        f"函数名数量: {len(self.function_name_repo_dict)}")
-        logger.critical(f"测试用例情况:{test_case_count}, testcase file num:{test_case_file_count}")
-        logger.critical(f"测试阈值: {threshold}")
-        logger.critical(f"检测结果：")
-        # repo
-        precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
-        logger.critical(
-            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
-        # version
-        precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
-        logger.critical(
-            f"repo level sca result: {self.version_sca_check_result}, precision: {precision}, recall: {recall}")
+                # 拼成一个列表，为了以后报出多个结果做准备
+        sca_results = [final_result, ] if final_result else []
+        return sca_results

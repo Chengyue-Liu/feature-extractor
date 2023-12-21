@@ -47,19 +47,7 @@ class TestCase:
         self.file_strings = file_strings
 
     @classmethod
-    def get_test_cases(cls):
-        """
-        这个方法可以筛选测试用例，加快测试速度等等。
-
-        :return:
-        """
-        return cls.init_from_test_cases_json_file()
-
-    @classmethod
-    def init_from_test_cases_json_file(cls, f_path=TEST_CASES_JSON_PATH):
-        """
-        从测试用例文件生成测试用例
-        """
+    def get_test_cases(cls, f_path=TEST_CASES_JSON_PATH):
         with open(f_path) as f:
             repo_jsons = json.load(f)
             test_cases = [
@@ -71,3 +59,20 @@ class TestCase:
                 )
                 for repo_json in repo_jsons]
         return test_cases
+
+    def custom_serialize(self):
+        """
+                self.ground_truth_repo_id = ground_truth_repo_id
+        self.ground_truth_version_id = ground_truth_version_id
+        self.file_path = file_path
+        self.file_strings = file_strings
+
+        :return:
+        """
+        return {
+            "file_path": self.file_path,
+            "file_name": os.path.basename(self.file_path),
+            "ground_truth_repo_id": self.ground_truth_repo_id,
+            "ground_truth_version_id": self.ground_truth_version_id,
+            "strings_num": len(self.file_strings),
+        }

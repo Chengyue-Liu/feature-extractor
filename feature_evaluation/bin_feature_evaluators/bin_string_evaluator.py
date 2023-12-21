@@ -58,18 +58,21 @@ class BinStringEvaluator(FeatureEvaluator):
                 repo_version_id_set.add((repo_id, version_id))
         logger.info(f"{self.__class__.__name__} inited")
 
-    def evaluate(self, test_cases):
+    def statistic(self):
         # 分布统计
+        logger.info(f"src repo ---> bin strings")
         repo_string_nums = [len(repo_feature.strings) for repo_feature in self.bin_string_feature_dict.values()]
-        self.statistic_data(repo_string_nums, specific_values=[0, 1, 2, 3, 4, 5], sample_name="bin_repo",
-                            feature_name="bin_string")
+        self.repo_to_feature_statistic_result = self.statistic_data(repo_string_nums,
+                                                                    specific_values=[0, 1, 2, 3, 4, 5],
+                                                                    sample_name="bin_repo",
+                                                                    feature_name="bin_string")
 
+        logger.info(f"bin strings ---> src repo")
         string_seen_repository_num_list = [len(v) for v in self.string_repo_dict.values()]
-        self.statistic_data(string_seen_repository_num_list, specific_values=[1, 2, 3, 4, 5], sample_name="bin_string",
-                            feature_name="bin_repo")
-
-        # sca 效果评估
-        self.sca_evaluate(test_cases, BIN_STRING_SCA_THRESHOLD)
+        self.feature_to_repo_statistic_result = self.statistic_data(string_seen_repository_num_list,
+                                                                    specific_values=[1, 2, 3, 4, 5],
+                                                                    sample_name="bin_string",
+                                                                    feature_name="bin_repo")
 
     def sca(self, strings):
         # 根据字符串查询对应的library_id, version_id
@@ -82,31 +85,16 @@ class BinStringEvaluator(FeatureEvaluator):
         all_results = counter.most_common(20)  # (repo_id, version_id), count
 
         # 筛选
-        filtered_results = []
+        final_result = None
+        max_percent = BIN_STRING_SCA_THRESHOLD
         for (repo_id, version_id), count in all_results:
             key = f"{repo_id}-{version_id}"
             string_num = self.bin_string_num_dict.get(key)
             percent = round(count / string_num, 2)
             if percent > BIN_STRING_SCA_THRESHOLD:
-                filtered_results.append((repo_id, version_id))
-                # 预览扫描结果
-                # print(file_name, percent)
-        return filtered_results
+                if percent > max_percent:
+                    final_result = (repo_id, version_id, percent)
 
-    def sca_summary(self, test_case_count, test_case_file_count, threshold):
-        # basic summary
-        logger.critical(f"收录的库数量：{len(self.bin_string_feature_dict)}, "
-                        f"{len(self.repo_features)}(区分release, arch), "
-                        f"字符串数量: {len(self.string_repo_dict)}")
-        logger.critical(f"测试用例:{TEST_CASES_JSON_PATH}, 文件数量：{test_case_file_count}")
-        logger.critical(f"测试阈值: {threshold}")
-        logger.critical(f"检测结果：")
-
-        # repo
-        precision, recall = self.cal_precision_and_recall(self.repo_sca_check_result)
-        logger.critical(
-            f"repo level sca result: {self.repo_sca_check_result}, precision: {precision}, recall: {recall}")
-        # version
-        precision, recall = self.cal_precision_and_recall(self.version_sca_check_result)
-        logger.critical(
-            f"repo level sca result: {self.version_sca_check_result}, precision: {precision}, recall: {recall}")
+                # 拼成一个列表，为了以后报出多个结果做准备
+            sca_results = [final_result, ] if final_result else []
+            return sca_results
